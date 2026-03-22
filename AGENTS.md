@@ -71,9 +71,31 @@ After EVERY task:
 
 ---
 
-### 5. General Rules
+### 5. UI (STRICT)
+
+* Mobile-first ALWAYS (primary target)
+
+### Mobile
+
+* No horizontal scroll
+* Touch-friendly UI
+* Smooth performance
+
+### Desktop
+
+* Scale from mobile (no separate design)
+* Improve spacing/layout only
+
+### Rules
+
+* Build mobile → enhance with breakpoints
+* Avoid fixed sizes
+
+---
+
+
+### 6. General Rules
 
 * Follow existing patterns strictly
 * Do not introduce new patterns without approval
 * Keep changes minimal and scoped
-

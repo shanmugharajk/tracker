@@ -11,13 +11,13 @@ export function Header({ userName }: HeaderProps) {
   const { currency, setCurrency } = useCurrencyParam();
 
   return (
-    <header className="border-b shadow-xs">
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex flex-col gap-1">
-          <span className="text-xs tracking-widest text-muted-foreground">
+    <header className="shrink-0 border-b">
+      <div className="flex items-center justify-between px-4 py-3 md:px-8">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
             Welcome
           </span>
-          <span className="text-sm font-semibold leading-tight">
+          <span className="text-sm font-semibold leading-tight md:text-base">
             {userName}
           </span>
         </div>

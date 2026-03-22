@@ -14,13 +14,15 @@ export async function AppShell({ children }: AppShellProps) {
   if (!session) return <>{children}</>;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex h-dvh flex-col">
       <Header userName={session.user.name} />
 
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
+        {children}
+      </main>
 
-      <footer className="border-t shadow-lg">
-        <div className="px-4 py-4 text-sm text-muted-foreground">
+      <footer className="shrink-0 border-t">
+        <div className="px-4 py-3 text-center text-xs text-muted-foreground md:px-8 md:text-left md:text-sm">
           © 2026 Tracker. All rights reserved.
         </div>
       </footer>
