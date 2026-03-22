@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
-
-import { CustomSwitch } from "~/components/ui/custom-switch";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { useCurrencyParam } from "~/lib/hooks/use-currency-param";
 
 interface HeaderProps {
   userName: string;
 }
 
 export function Header({ userName }: HeaderProps) {
-  const [currency, setCurrency] = useState<0 | 1>(0);
+  const { currency, setCurrency } = useCurrencyParam();
 
   return (
     <header className="border-b shadow-xs">
@@ -18,14 +17,13 @@ export function Header({ userName }: HeaderProps) {
           <span className="text-xs uppercase tracking-widest text-muted-foreground">
             Welcome
           </span>
-          <span className="text-2xl font-bold leading-tight">{userName}</span>
+          <span className="text-lg font-bold leading-tight">{userName}</span>
         </div>
 
-        <CustomSwitch
-          options={["$ CAD", "₹ INR"]}
-          value={currency}
-          onValueChange={setCurrency}
-        />
+        <ToggleGroup type="single" value={currency} onValueChange={setCurrency}>
+          <ToggleGroupItem value="cad">$ CAD</ToggleGroupItem>
+          <ToggleGroupItem value="inr">₹ INR</ToggleGroupItem>
+        </ToggleGroup>
       </div>
     </header>
   );
