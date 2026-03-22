@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { AppShell } from "~/components/layout/app-shell";
 import { ThemeProvider } from "~/components/theme-provider";
 import { cn } from "~/lib/cn";
 
@@ -36,9 +35,7 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, geist.variable)}
     >
       <body>
-        <ThemeProvider>
-          <AppShell>{children}</AppShell>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
