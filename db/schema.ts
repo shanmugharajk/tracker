@@ -1,5 +1,79 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
+// expense tracker tables
+export const categories = sqliteTable("categories", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  emoji: text("emoji").notNull(),
+  color: text("color").notNull(),
+  sortOrder: integer("sort_order").notNull(),
+});
+
+export const expenses = sqliteTable(
+  "expenses",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    categoryId: integer("category_id")
+      .notNull()
+      .references(() => categories.id),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    date: text("date").notNull(),
+    tag: text("tag"),
+    comment: text("comment"),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_expenses_user_currency").on(table.userId, table.currency),
+    index("idx_expenses_user_date").on(table.userId, table.date),
+    index("idx_expenses_user_category").on(table.userId, table.categoryId),
+  ],
+);
+
+export const debtAccounts = sqliteTable(
+  "debt_accounts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    comment: text("comment"),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_debt_accounts_user_name").on(table.userId, table.name),
+  ],
+);
+
+export const debtTransactions = sqliteTable(
+  "debt_transactions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    debtAccountId: integer("debt_account_id")
+      .notNull()
+      .references(() => debtAccounts.id, { onDelete: "cascade" }),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    date: text("date").notNull(),
+    comment: text("comment"),
+    createdAt: integer("created_at").notNull(),
+  },
+  (table) => [index("idx_debt_tx_account").on(table.debtAccountId)],
+);
+
+// Better auth managed tables
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
