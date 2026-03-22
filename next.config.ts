@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
+const devOrigins = ["tracker.local"];
+if (process.env.DEV_ORIGIN) {
+  devOrigins.push(process.env.DEV_ORIGIN);
+}
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: devOrigins,
 };
 
 export default nextConfig;

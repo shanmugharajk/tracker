@@ -14,10 +14,12 @@ export function Header({ userName }: HeaderProps) {
     <header className="border-b shadow-xs">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex flex-col gap-1">
-          <span className="text-xs uppercase tracking-widest text-muted-foreground">
+          <span className="text-xs tracking-widest text-muted-foreground">
             Welcome
           </span>
-          <span className="text-lg font-bold leading-tight">{userName}</span>
+          <span className="text-sm font-semibold leading-tight">
+            {userName}
+          </span>
         </div>
 
         <ToggleGroup type="single" value={currency} onValueChange={setCurrency}>
