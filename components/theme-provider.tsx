@@ -3,24 +3,6 @@
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import * as React from "react";
 
-function ThemeProvider({
-  children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      {...props}
-    >
-      <ThemeHotkey />
-      {children}
-    </NextThemesProvider>
-  );
-}
-
 function isTypingTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) {
     return false;
@@ -34,7 +16,7 @@ function isTypingTarget(target: EventTarget | null) {
   );
 }
 
-function ThemeHotkey() {
+function useThemeHotkey() {
   const { resolvedTheme, setTheme } = useTheme();
 
   React.useEffect(() => {
@@ -47,7 +29,7 @@ function ThemeHotkey() {
         return;
       }
 
-      if (event.key.toLowerCase() !== "d") {
+      if (event.key?.toLowerCase() !== "d") {
         return;
       }
 
@@ -64,8 +46,29 @@ function ThemeHotkey() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [resolvedTheme, setTheme]);
+}
 
+function ThemeHotkeyInit() {
+  useThemeHotkey();
   return null;
+}
+
+function ThemeProvider({
+  children,
+  ...props
+}: React.ComponentProps<typeof NextThemesProvider>) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      {...props}
+    >
+      <ThemeHotkeyInit />
+      {children}
+    </NextThemesProvider>
+  );
 }
 
 export { ThemeProvider };
