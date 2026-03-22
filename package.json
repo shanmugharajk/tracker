@@ -10,7 +10,7 @@
     "format": "biome format --write",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "bun run db/seed/seed.ts"
+    "db:seed": "bun run db/seed/index.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.17.2",
