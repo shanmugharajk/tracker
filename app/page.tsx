@@ -1,5 +1,3 @@
 export default function Home() {
-  return (
-    <div>Tracker</div>
-  );
+  return <div>Tracker</div>;
 }
