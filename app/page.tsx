@@ -1,3 +1,7 @@
 export default function Home() {
-  return <div>Tracker</div>;
+  return (
+    <div>
+      <h1>Tracker</h1>
+    </div>
+  );
 }

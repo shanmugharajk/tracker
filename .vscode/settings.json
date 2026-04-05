@@ -6,9 +6,6 @@
   // Formatter
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   // Tailwind
-  "editor.quickSuggestions": {
-    "strings": "on"
-  },
   "files.associations": {
     "*.css": "tailwindcss"
   }
