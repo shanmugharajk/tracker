@@ -8,5 +8,6 @@
   // Tailwind
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "chatgpt.commentCodeLensEnabled": false
 }
