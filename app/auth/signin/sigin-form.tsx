@@ -97,7 +97,7 @@ export function SigninForm() {
    */
   const disableSubmit =
     isBusy ||
-    (submissionAttempts > 0 && !formError && !canSubmit && isValidating);
+    (submissionAttempts > 0 && !formError && (!canSubmit || isValidating));
 
   return (
     <Card>
@@ -134,7 +134,9 @@ export function SigninForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      aria-describedby={`${field.name}-error`}
+                      aria-describedby={
+                        isInvalid ? `${field.name}-error` : undefined
+                      }
                       placeholder="shan@mail.com"
                       autoComplete="email"
                     />
@@ -165,7 +167,9 @@ export function SigninForm() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
-                      aria-describedby={`${field.name}-error`}
+                      aria-describedby={
+                        isInvalid ? `${field.name}-error` : undefined
+                      }
                       autoComplete="current-password"
                       placeholder="password"
                     />
