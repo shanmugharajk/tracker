@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "seed": "bun ./server/db/seed/index.ts"
+    "db:migrate": "drizzle-kit generate && drizzle-kit migrate",
+    "db:seed": "bun ./server/db/seed/index.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",

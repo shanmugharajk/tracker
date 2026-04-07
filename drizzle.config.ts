@@ -6,7 +6,7 @@ import { env } from '~/config/env';
 config({ path: '.env' });
 
 export default defineConfig({
-  schema: './server/db/schemas.ts',
+  schema: './server/db/schema.ts',
   out: './server/db/migrations',
   dialect: 'sqlite',
   dbCredentials: {

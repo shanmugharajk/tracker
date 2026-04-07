@@ -117,11 +117,19 @@ export const auth = betterAuth({
 bun x auth@latest generate --config ./server/libs/auth.ts --output ./server/db/schemas.ts
 ```
 
-10. Create migration and generate tables
+10. Create migration and generate tables with seed data
 
 ```bash
 bunx drizzle-kit generate
 bunx drizzle-kit migrate
+bun db:seed
+```
+
+or
+
+```bash
+bun db:migrate
+bun db:seed
 ```
 
 ## Usage
