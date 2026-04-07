@@ -6,38 +6,43 @@ import {
 } from '@tanstack/react-form-nextjs';
 import { redirect } from 'next/navigation';
 
-import { auth } from '~/server/lib/auth';
-
-import { formOpts, signinSchema } from './shared';
 import { APIError } from 'better-auth';
+
+import { auth } from '~/server/lib/auth';
+import type { ServerFormAction } from '~/lib/forms/use-server-form';
+
+import { signinContract, type SigninFormValues } from './shared';
 
 // https://github.com/TanStack/form/discussions/778
 export const serverValidateSignin = createServerValidate({
-  ...formOpts,
-  onServerValidate: signinSchema,
+  ...signinContract.formOpts,
+  onServerValidate: signinContract.schema,
 });
 
-export async function signinAction(previous: unknown, formData: FormData) {
+export const signinAction: ServerFormAction<SigninFormValues> = async (
+  _previous,
+  formData
+) => {
   try {
     const { email, password } = await serverValidateSignin(formData);
     await auth.api.signInEmail({
       body: { email, password },
     });
-  } catch (e) {
-    if (e instanceof ServerValidateError) {
-      return e.formState;
+  } catch (error) {
+    if (error instanceof ServerValidateError) {
+      return error.formState;
     }
 
-    if (e instanceof APIError && e.status === 'UNAUTHORIZED') {
-      return { errorMap: { onSubmit: { form: e.message } } };
-    } else {
-      return {
-        errorMap: {
-          onSubmit: { form: 'Something went wrong, please try again later!' },
-        },
-      };
+    if (error instanceof APIError && error.status === 'UNAUTHORIZED') {
+      return { errorMap: { onSubmit: { form: error.message } } };
     }
+
+    return {
+      errorMap: {
+        onSubmit: { form: 'Something went wrong, please try again later!' },
+      },
+    };
   }
 
   redirect('/');
-}
+};
