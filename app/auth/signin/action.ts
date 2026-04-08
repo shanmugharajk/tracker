@@ -12,6 +12,7 @@ import { auth } from '~/server/lib/auth';
 import type { ServerFormAction } from '~/lib/forms/use-server-form';
 
 import { signinContract, type SigninFormValues } from './shared';
+import { sleep } from '~/lib/misc';
 
 // https://github.com/TanStack/form/discussions/778
 export const serverValidateSignin = createServerValidate({
@@ -25,6 +26,7 @@ export const signinAction: ServerFormAction<SigninFormValues> = async (
 ) => {
   try {
     const { email, password } = await serverValidateSignin(formData);
+    await sleep();
     await auth.api.signInEmail({
       body: { email, password },
     });
@@ -43,6 +45,12 @@ export const signinAction: ServerFormAction<SigninFormValues> = async (
       },
     };
   }
+
+  return {
+    errorMap: {
+      onSubmit: { form: 'Something went wrong, please try again later!' },
+    },
+  };
 
   redirect('/');
 };

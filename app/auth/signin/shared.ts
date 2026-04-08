@@ -12,7 +12,7 @@ export type SigninFormValues = z.infer<typeof signinSchema>;
 export const signinContract = createFormContract({
   schema: signinSchema,
   defaultValues: {
-    email: '',
-    password: '',
+    email: 'shan@mail.com',
+    password: 'shan@1234',
   },
 });
