@@ -1,13 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
-import {
-  initialFormState,
-  mergeForm,
-  revalidateLogic,
-  useForm,
-  useTransform,
-} from '@tanstack/react-form-nextjs';
+import { initialFormState } from '@tanstack/react-form-nextjs';
+import { useForm } from '@tanstack/react-form-nextjs';
 
 import { FieldGroup } from '~/components/ui/field';
 import { Input } from '~/components/ui/input';
@@ -21,6 +16,7 @@ import {
 } from '~/components/ui/card';
 import { FormError } from '~/lib/forms/form-error';
 import { SubmitButton } from '~/lib/forms/submit-button';
+import { useServerFormOptions } from '~/lib/forms/server-form';
 
 import { signinAction } from './action';
 import { formOpts, signinSchema } from './shared';
@@ -33,15 +29,7 @@ export function SigninForm() {
 
   const form = useForm({
     ...formOpts,
-    validators: { onDynamic: signinSchema },
-    validationLogic: revalidateLogic({
-      mode: 'submit',
-      modeAfterSubmission: 'change',
-    }),
-    transform: useTransform(
-      (baseForm) => mergeForm(baseForm, state as never),
-      [state]
-    ),
+    ...useServerFormOptions(signinSchema, state),
   });
 
   return (
