@@ -5,24 +5,19 @@ import {
   ServerValidateError,
 } from '@tanstack/react-form-nextjs';
 import { redirect } from 'next/navigation';
-
 import { APIError } from 'better-auth';
 
 import { auth } from '~/server/lib/auth';
-import type { ServerFormAction } from '~/lib/forms/use-server-form';
 
-import { signinContract, type SigninFormValues } from './shared';
+import { formOpts, signinSchema } from './shared';
 
 // https://github.com/TanStack/form/discussions/778
 export const serverValidateSignin = createServerValidate({
-  ...signinContract.formOpts,
-  onServerValidate: signinContract.schema,
+  ...formOpts,
+  onServerValidate: signinSchema,
 });
 
-export const signinAction: ServerFormAction<SigninFormValues> = async (
-  _previous,
-  formData
-) => {
+export const signinAction = async (_previous: unknown, formData: FormData) => {
   try {
     const { email, password } = await serverValidateSignin(formData);
     await auth.api.signInEmail({

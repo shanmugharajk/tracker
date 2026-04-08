@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { createFormContract } from '~/lib/forms/create-form-contract';
+import { formOptions } from '@tanstack/react-form-nextjs';
 
 export const signinSchema = z.object({
   email: z.email('Invalid email'),
@@ -9,8 +9,7 @@ export const signinSchema = z.object({
 
 export type SigninFormValues = z.infer<typeof signinSchema>;
 
-export const signinContract = createFormContract({
-  schema: signinSchema,
+export const formOpts = formOptions({
   defaultValues: {
     email: '',
     password: '',

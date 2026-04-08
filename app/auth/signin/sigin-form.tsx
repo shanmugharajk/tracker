@@ -1,14 +1,17 @@
 'use client';
 
+import { useActionState } from 'react';
+import {
+  initialFormState,
+  mergeForm,
+  revalidateLogic,
+  useForm,
+  useTransform,
+} from '@tanstack/react-form-nextjs';
+
 import { FieldGroup } from '~/components/ui/field';
 import { Input } from '~/components/ui/input';
-import { Button } from '~/components/ui/button';
 import { FormField } from '~/components/form-field';
-import { useServerForm } from '~/lib/forms/use-server-form';
-
-import { signinAction } from './action';
-import { signinContract } from './shared';
-
 import {
   Card,
   CardContent,
@@ -16,12 +19,30 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import { FormError } from '~/lib/forms/form-error';
+import { SubmitButton } from '~/lib/forms/submit-button';
+
+import { signinAction } from './action';
+import { formOpts, signinSchema } from './shared';
 
 export function SigninForm() {
-  const { action, form, formError, isBusy, disableSubmit } = useServerForm(
-    signinContract,
-    signinAction
+  const [state, action, pending] = useActionState(
+    signinAction,
+    initialFormState
   );
+
+  const form = useForm({
+    ...formOpts,
+    validators: { onDynamic: signinSchema },
+    validationLogic: revalidateLogic({
+      mode: 'submit',
+      modeAfterSubmission: 'change',
+    }),
+    transform: useTransform(
+      (baseForm) => mergeForm(baseForm, state as never),
+      [state]
+    ),
+  });
 
   return (
     <Card>
@@ -37,9 +58,7 @@ export function SigninForm() {
           onSubmit={form.handleSubmit}
           noValidate
         >
-          {formError && (
-            <div className="mb-4 text-sm text-red-500">{formError}</div>
-          )}
+          <FormError form={form} pending={pending} />
 
           <FieldGroup>
             <FormField
@@ -98,9 +117,7 @@ export function SigninForm() {
               )}
             />
 
-            <Button type="submit" form="signin-form" disabled={disableSubmit}>
-              {isBusy ? 'Submitting...' : 'Submit'}
-            </Button>
+            <SubmitButton form={form} pending={pending} />
           </FieldGroup>
         </form>
       </CardContent>
