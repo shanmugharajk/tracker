@@ -13,6 +13,15 @@ export function FormError({
   pending,
   className = 'mb-4 text-sm text-red-500',
 }: FormErrorProps) {
+  /**
+   * Show server error only when:
+   * - user has attempted submit
+   * - current fields are valid
+   *
+   * Reason:
+   * Server errors are only meaningful for valid input.
+   * If user changes input to invalid, hide stale server error.
+   */
   const formError = useStore(form.store, (state) => {
     const { submissionAttempts, isFieldsValid, errors } = state;
 
