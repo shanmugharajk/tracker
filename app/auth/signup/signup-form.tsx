@@ -18,32 +18,30 @@ import { FormError } from '~/lib/forms/form-error';
 import { SubmitButton } from '~/lib/forms/submit-button';
 import { useServerFormOptions } from '~/lib/forms/server-form';
 
-import { signinAction } from './action';
-import { formOpts, signinSchema } from './shared';
-import { Button } from '~/components/ui/button';
-import Link from 'next/link';
+import { signupAction } from './action';
+import { formOpts, signupSchema } from './shared';
 
-export function SigninForm() {
+export function SignupForm() {
   const [state, action, pending] = useActionState(
-    signinAction,
+    signupAction,
     initialFormState
   );
 
   const form = useForm({
     ...formOpts,
-    ...useServerFormOptions(signinSchema, state),
+    ...useServerFormOptions(signupSchema, state),
   });
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Signin</CardTitle>
-        <CardDescription>Signin to the awesome Tracker!</CardDescription>
+        <CardTitle>Signup</CardTitle>
+        <CardDescription>Create your Tracker account.</CardDescription>
       </CardHeader>
 
       <CardContent>
         <form
-          id="signin-form"
+          id="signup-form"
           action={action}
           onSubmit={form.handleSubmit}
           noValidate
@@ -51,6 +49,34 @@ export function SigninForm() {
           <FormError form={form} pending={pending} />
 
           <FieldGroup>
+            <FormField
+              fieldComponent={form.Field}
+              name="name"
+              label="Name"
+              render={({
+                name,
+                value,
+                handleBlur,
+                handleChange,
+                invalid,
+                errorId,
+                inputId,
+              }) => (
+                <Input
+                  type="text"
+                  id={inputId}
+                  name={name}
+                  value={value}
+                  onBlur={handleBlur}
+                  onChange={(e) => handleChange(e.target.value)}
+                  aria-invalid={invalid}
+                  aria-describedby={invalid ? errorId : undefined}
+                  placeholder="Shan"
+                  autoComplete="name"
+                />
+              )}
+            />
+
             <FormField
               fieldComponent={form.Field}
               name="email"
@@ -101,18 +127,18 @@ export function SigninForm() {
                   onChange={(e) => handleChange(e.target.value)}
                   aria-invalid={invalid}
                   aria-describedby={invalid ? errorId : undefined}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   placeholder="password"
                 />
               )}
             />
 
-            <div className="space-x-2">
-              <SubmitButton form={form} pending={pending} />
-              <Link href="signup">
-                <Button variant="secondary">Signup</Button>
-              </Link>
-            </div>
+            <SubmitButton
+              form={form}
+              pending={pending}
+              text="Signup"
+              submittingText="Signing up..."
+            />
           </FieldGroup>
         </form>
       </CardContent>
