@@ -5,6 +5,7 @@ import { cn } from '~/lib/cn';
 
 import '~/app/styles/globals.css';
 import { ThemeProvider } from '~/components/theme-provider';
+import { TooltipProvider } from '~/components/ui/tooltip';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -35,7 +36,9 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
