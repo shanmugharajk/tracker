@@ -30,22 +30,19 @@ type FormFieldProps<
   TName extends DeepKeys<TFormData>,
   TFormOnMount extends undefined | FormValidateOrFn<TFormData> = undefined,
   TFormOnChange extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnChangeAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnChangeAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TFormOnBlur extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnBlurAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnBlurAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TFormOnSubmit extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnSubmitAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnSubmitAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TFormOnDynamic extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnDynamicAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
-  TFormOnServer extends undefined | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnDynamicAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
+  TFormOnServer extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TSubmitMeta = never,
 > = {
   fieldComponent: FieldComponent<
@@ -72,22 +69,19 @@ export function FormField<
   TName extends DeepKeys<TFormData>,
   TFormOnMount extends undefined | FormValidateOrFn<TFormData> = undefined,
   TFormOnChange extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnChangeAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnChangeAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TFormOnBlur extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnBlurAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnBlurAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TFormOnSubmit extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnSubmitAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnSubmitAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TFormOnDynamic extends undefined | FormValidateOrFn<TFormData> = undefined,
-  TFormOnDynamicAsync extends
-    | undefined
-    | FormAsyncValidateOrFn<TFormData> = undefined,
-  TFormOnServer extends undefined | FormAsyncValidateOrFn<TFormData> = undefined,
+  TFormOnDynamicAsync extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
+  TFormOnServer extends undefined | FormAsyncValidateOrFn<TFormData> =
+    undefined,
   TSubmitMeta = never,
 >({
   fieldComponent: FieldComponent,
