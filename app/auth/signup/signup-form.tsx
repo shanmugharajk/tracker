@@ -133,12 +133,14 @@ export function SignupForm() {
               )}
             />
 
-            <SubmitButton
-              form={form}
-              pending={pending}
-              text="Signup"
-              submittingText="Signing up..."
-            />
+            <div className="w-fit">
+              <SubmitButton
+                form={form}
+                pending={pending}
+                text="Signup"
+                submittingText="Signing up..."
+              />
+            </div>
           </FieldGroup>
         </form>
       </CardContent>
