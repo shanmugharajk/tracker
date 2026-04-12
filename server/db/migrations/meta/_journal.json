@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1775752878091,
-      "tag": "0000_add_better_auth_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1775766706616,
-      "tag": "0001_0001_add_ledger_table",
+      "when": 1776012605652,
+      "tag": "0000_tracker_db_init",
       "breakpoints": true
     }
   ]

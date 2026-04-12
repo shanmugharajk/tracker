@@ -24,6 +24,8 @@ export const ledgerEntryCategories = [
   'Shopping',
 ] as const;
 
+export const ledgerSettlementTargets = ['expense', 'loan'] as const;
+
 export const ledgerEntry = sqliteTable(
   'ledger_entry',
   {
@@ -32,7 +34,10 @@ export const ledgerEntry = sqliteTable(
       onDelete: 'set null',
     }),
     type: text('type', { enum: ledgerEntryTypes }).notNull(),
-    category: text('category', { enum: ledgerEntryCategories }).notNull(),
+    category: text('category', { enum: ledgerEntryCategories }),
+    settlementFor: text('settlement_for', {
+      enum: ledgerSettlementTargets,
+    }),
     tags: text('tags'),
     amount: real('amount').notNull(),
     paidByUserId: text('paid_by_user_id').references(() => user.id, {
@@ -58,6 +63,7 @@ export const ledgerEntry = sqliteTable(
     index('ledger_entry_person_id_idx').on(table.personId),
     index('ledger_entry_type_idx').on(table.type),
     index('ledger_entry_category_idx').on(table.category),
+    index('ledger_entry_settlement_for_idx').on(table.settlementFor),
     index('ledger_entry_paid_by_user_id_idx').on(table.paidByUserId),
     index('ledger_entry_created_by_idx').on(table.createdBy),
     index('ledger_entry_updated_by_idx').on(table.updatedBy),
@@ -65,6 +71,22 @@ export const ledgerEntry = sqliteTable(
     check(
       'ledger_entry_split_type_chk',
       sql`${table.type} = 'expense' or ${table.isSplit} = false`
+    ),
+    check(
+      'ledger_entry_category_type_chk',
+      sql`${table.type} = 'settlement' or ${table.category} is not null`
+    ),
+    check(
+      'ledger_entry_category_settlement_null_chk',
+      sql`${table.type} != 'settlement' or ${table.category} is null`
+    ),
+    check(
+      'ledger_entry_settlement_for_type_chk',
+      sql`${table.type} != 'settlement' or ${table.settlementFor} is not null`
+    ),
+    check(
+      'ledger_entry_settlement_for_null_chk',
+      sql`${table.type} = 'settlement' or ${table.settlementFor} is null`
     ),
   ]
 );
