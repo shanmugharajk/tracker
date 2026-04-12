@@ -1,4 +1,4 @@
-import { SigninForm } from './sigin-form';
+import { SigninForm } from './signin-form';
 
 export default function Signin() {
   return (

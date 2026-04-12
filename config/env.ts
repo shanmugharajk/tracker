@@ -1,5 +1,27 @@
 import { z } from 'zod';
 
+const SeedUserNamesSchema = z.string().transform((val, ctx) => {
+  const names = val.split(',').map((s) => s.trim());
+
+  if (names.length !== 3 || names.some((name) => name.length === 0)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'SEED_USER_NAMES must contain exactly three usernames.',
+    });
+    return z.NEVER;
+  }
+
+  if (new Set(names).size !== names.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'SEED_USER_NAMES must not contain duplicate usernames.',
+    });
+    return z.NEVER;
+  }
+
+  return names as unknown as readonly [string, string, string];
+});
+
 const EnvSchema = z.object({
   DEV_ORIGINS: z
     .string()
@@ -8,9 +30,7 @@ const EnvSchema = z.object({
 
   DATABASE_URL: z.string().min(5),
 
-  USER_NAME: z.string().min(4),
-  SIGNUP_EMAIL: z.email(),
-  PASSWORD: z.string().min(5),
+  SEED_USER_NAMES: SeedUserNamesSchema,
 });
 
 export const env = EnvSchema.parse(process.env);

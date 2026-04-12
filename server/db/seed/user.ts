@@ -1,28 +1,35 @@
-import { eq } from 'drizzle-orm';
-
 import { env } from '~/config/env';
 import { auth } from '~/server/lib/auth';
-import { db, user } from '~/server/db';
 
-export async function seedUser() {
-  const existing = await db
-    .select()
-    .from(user)
-    .where(eq(user.email, env.SIGNUP_EMAIL))
-    .limit(1);
+import { SEED_USER_ROLES, type SeedUserIds } from './shared';
 
-  if (existing.length > 0) {
-    console.log('👤 User already exists');
-    return;
+export type SeedUserNames = readonly [string, string, string];
+
+export const createSeedEmail = (username: string) =>
+  `${username.trim().toLowerCase()}@mail.com`;
+
+export async function seedUser(
+  userNames: SeedUserNames = env.SEED_USER_NAMES
+): Promise<SeedUserIds> {
+  const seededUsers = {} as SeedUserIds;
+
+  for (const [index, name] of userNames.entries()) {
+    const email = createSeedEmail(name);
+    const result = await auth.api.signUpEmail({
+      body: {
+        name,
+        email,
+        password: `${name.toLowerCase()}@1234`,
+      },
+    });
+
+    if (!result?.user?.id) {
+      throw new Error(`Failed to seed user: ${name}.`);
+    }
+
+    seededUsers[SEED_USER_ROLES[index]] = result.user.id;
   }
 
-  const newUser = await auth.api.signUpEmail({
-    body: {
-      email: env.SIGNUP_EMAIL,
-      password: env.PASSWORD,
-      name: env.USER_NAME,
-    },
-  });
-
-  console.log('🌱 Seeded user:', newUser);
+  console.log(`👤 Seeded users: ${userNames.join(', ')}`);
+  return seededUsers;
 }

@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "portless tracker next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "bun ./server/db/seed/index.ts"
+    "db:seed": "bun ./server/db/seed/index.ts",
+    "db:clean-seed": "rm -rf ./tracker.db && bun db:migrate && bun ./server/db/seed/index.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",

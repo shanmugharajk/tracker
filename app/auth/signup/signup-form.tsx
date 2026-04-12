@@ -71,7 +71,7 @@ export function SignupForm() {
                   onChange={(e) => handleChange(e.target.value)}
                   aria-invalid={invalid}
                   aria-describedby={invalid ? errorId : undefined}
-                  placeholder="Shan"
+                  placeholder="user name"
                   autoComplete="name"
                 />
               )}
@@ -99,7 +99,7 @@ export function SignupForm() {
                   onChange={(e) => handleChange(e.target.value)}
                   aria-invalid={invalid}
                   aria-describedby={invalid ? errorId : undefined}
-                  placeholder="shan@mail.com"
+                  placeholder="your email@domain.com"
                   autoComplete="email"
                 />
               )}
