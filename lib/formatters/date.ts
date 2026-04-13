@@ -15,6 +15,20 @@ export const MONTHS = [
 
 export type Month = (typeof MONTHS)[number];
 
+export function getMonthNumber(month: Month) {
+  return MONTHS.indexOf(month) + 1;
+}
+
+export function getMonthFromNumber(month: number) {
+  const resolvedMonth = MONTHS[month - 1];
+
+  if (!resolvedMonth) {
+    throw new RangeError(`Month must be between 1 and 12. Received ${month}.`);
+  }
+
+  return resolvedMonth;
+}
+
 export const FILTER_YEAR_START = 2025;
 export const FILTER_YEAR_END = 2045;
 export const FILTER_YEARS = Array.from(

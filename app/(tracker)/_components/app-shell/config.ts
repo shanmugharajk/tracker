@@ -16,6 +16,10 @@ export const sidebarData: NavGroup[] = [
     url: '/',
     items: [
       {
+        title: 'Dashboard',
+        url: '/',
+      },
+      {
         title: 'All expenses',
         url: '/all-expenses',
       },
