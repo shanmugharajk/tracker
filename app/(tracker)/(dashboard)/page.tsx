@@ -1,6 +1,8 @@
 import { requireSession, resolveDateFilters } from '~/server/lib/request';
-import { summarizeExpenses } from '~/server/services/expense-summary';
-import { fetchExpensesByMonth } from '~/server/services/ledger';
+import {
+  fetchExpensesByMonth,
+  summarizeExpenses,
+} from '~/server/services/ledger';
 
 import { DashboardView } from './dashboard-view';
 

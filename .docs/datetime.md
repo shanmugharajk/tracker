@@ -128,6 +128,9 @@ For the expense dashboard:
   - split expenses
   - expense settlements
 - balance is always relative to the current session user
+- current expense dashboard data assumes a two-person result set:
+  - the session user
+  - one other person in the expense rows
 
 Do not compute:
 

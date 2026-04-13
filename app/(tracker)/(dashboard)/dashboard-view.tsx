@@ -21,7 +21,7 @@ import {
 } from '~/components/ui/popover';
 import { formatMonth, type Month } from '~/lib/formatters/date';
 import { cn } from '~/lib/cn';
-import type { ExpenseSummary } from '~/server/services/expense-summary';
+import type { ExpenseSummary } from '~/server/services/ledger';
 
 import { DashboardMetricsSkeleton } from './dashboard-card-skeleton';
 import { formatCurrency } from '~/lib/formatters/currency';
@@ -73,10 +73,11 @@ function Stat({
 }
 
 function getBalanceState(summary: ExpenseSummary) {
-  const otherPersonLabel = summary.otherPersonName ?? 'Other person';
-  const amount = formatCurrency(Math.abs(summary.balance));
+  const otherPersonLabel =
+    summary.sharedExpenses.counterparty.name ?? 'Other person';
+  const amount = formatCurrency(Math.abs(summary.sharedExpenses.balance));
 
-  if (summary.balance > 0) {
+  if (summary.sharedExpenses.balance > 0) {
     return {
       eyebrow: 'They owe',
       amount,
@@ -86,7 +87,7 @@ function getBalanceState(summary: ExpenseSummary) {
     };
   }
 
-  if (summary.balance < 0) {
+  if (summary.sharedExpenses.balance < 0) {
     return {
       eyebrow: 'You owe',
       amount,
@@ -112,11 +113,20 @@ export function DashboardView({ month, year, summary }: DashboardViewProps) {
   const searchParams = useSearchParams();
 
   const balanceState = getBalanceState(summary);
-  const amountYouOwe = summary.balance < 0 ? Math.abs(summary.balance) : 0;
+  const amountYouOwe =
+    summary.sharedExpenses.balance < 0
+      ? Math.abs(summary.sharedExpenses.balance)
+      : 0;
   const youOweLabel =
-    summary.balance < 0 && balanceState.name
+    summary.sharedExpenses.balance < 0 && balanceState.name
       ? `You owe ${balanceState.name}`
       : 'You owe';
+  const youPaidLabel = summary.sharedExpenses.counterparty.name
+    ? `You paid for ${summary.sharedExpenses.counterparty.name}`
+    : 'You paid';
+  const otherPaidLabel = summary.sharedExpenses.counterparty.name
+    ? `${summary.sharedExpenses.counterparty.name} paid`
+    : 'Other person paid';
 
   function updateRoute(nextMonth: Month, nextYear: number) {
     const nextParams = new URLSearchParams(searchParams.toString());
@@ -176,39 +186,99 @@ export function DashboardView({ month, year, summary }: DashboardViewProps) {
           <DashboardMetricsSkeleton />
         ) : (
           <section aria-label="Expense summary">
-            {/* Top 3 categories start */}
-            <div className="mb-6 flex gap-2 justify-between">
-              {summary.topCategories.map((category) => (
-                <Stat
-                  key={category.name}
-                  label={category.name}
-                  value={formatCurrency(category.total)}
-                  className="border-l-2 border-teal-600 p-2"
-                />
-              ))}
-            </div>
-            {/* Top 3 categories start */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-semibold">Total expenses</p>
+                  <p className="text-xs text-muted-foreground">
+                    Includes individual and shared expenses for this month.
+                  </p>
+                </div>
 
-            <div className="flex items-center justify-between gap-2">
-              <Stat
-                label="Total spent"
-                value={formatCurrency(summary.totalExpense)}
-              />
-              <Stat
-                label="Per person"
-                value={formatCurrency(summary.expensePerPerson)}
-              />
-              <Stat
-                label={youOweLabel}
-                value={formatCurrency(amountYouOwe)}
-                tone={
-                  summary.balance < 0
-                    ? 'text-rose-600 dark:text-rose-400'
-                    : 'text-foreground'
-                }
-                showDot={summary.balance < 0}
-                dotClassName="bg-rose-500 dark:bg-rose-400"
-              />
+                <div className="flex items-center justify-between gap-2">
+                  <Stat
+                    label="Total"
+                    value={formatCurrency(summary.totalExpenses.total)}
+                  />
+                  <Stat
+                    label="Individual total"
+                    value={formatCurrency(summary.totalExpenses.individualTotal)}
+                  />
+                  <Stat
+                    label="Shared total"
+                    value={formatCurrency(summary.sharedExpenses.total)}
+                  />
+                </div>
+
+                {summary.totalExpenses.topCategories.length > 0 ? (
+                  <div className="flex justify-between gap-2">
+                    {summary.totalExpenses.topCategories.map((category) => (
+                      <Stat
+                        key={category.name}
+                        label={category.name}
+                        value={formatCurrency(category.total)}
+                        className="border-l-2 border-teal-600 p-2"
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="space-y-3 border-t pt-4">
+                <div>
+                  <p className="text-sm font-semibold">Shared expenses</p>
+                  <p className="text-xs text-muted-foreground">
+                    Split expenses and expense settlements only.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <Stat
+                    label="Shared total"
+                    value={formatCurrency(summary.sharedExpenses.total)}
+                  />
+                  <Stat
+                    label="Per person"
+                    value={formatCurrency(summary.sharedExpenses.expensePerPerson)}
+                  />
+                  <Stat
+                    label={youPaidLabel}
+                    value={formatCurrency(
+                      summary.sharedExpenses.totalPaidByCurrentUser
+                    )}
+                  />
+                  <Stat
+                    label={otherPaidLabel}
+                    value={formatCurrency(
+                      summary.sharedExpenses.totalPaidByOtherUser
+                    )}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-muted/40 px-4 py-3">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {balanceState.eyebrow}
+                    </p>
+                    <p className={cn('text-lg font-semibold', balanceState.tone)}>
+                      {balanceState.amount}
+                    </p>
+                  </div>
+
+                  <Stat
+                    label={youOweLabel}
+                    value={formatCurrency(amountYouOwe)}
+                    tone={
+                      summary.sharedExpenses.balance < 0
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : 'text-foreground'
+                    }
+                    showDot={summary.sharedExpenses.balance < 0}
+                    dotClassName="bg-rose-500 dark:bg-rose-400"
+                    className="max-w-[160px] flex-none"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="mt-5 flex items-center justify-end gap-2">

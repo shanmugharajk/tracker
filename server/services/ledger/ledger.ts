@@ -29,6 +29,8 @@ export type FetchExpensesByMonthParams = {
 
 const personUser = alias(user, 'person_user');
 
+// Expense pages currently operate on a two-person domain: the session user and
+// one counterparty in the returned expense rows. Loan flows are separate.
 function getExpenseTypeFilter(includeSettlement: boolean) {
   if (!includeSettlement) {
     return eq(ledgerEntry.type, 'expense');
