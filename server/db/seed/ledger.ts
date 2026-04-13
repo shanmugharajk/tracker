@@ -2,6 +2,9 @@ import { db, ledgerEntry } from '~/server/db';
 
 import { SEED_USER_ROLES, type SeedUserIds, type SeedUserRole } from './shared';
 
+// Seed fixtures intentionally use the server runtime timezone. These values are
+// not user-facing timezone data, so we keep them simple and do not normalize
+// them through a separate timezone layer.
 type LedgerSeed = {
   id: string;
   personRole: SeedUserRole | null;
@@ -24,6 +27,13 @@ const TERTIARY_USER = SEED_USER_ROLES[2];
 const resolveAuditRole = (entry: LedgerSeed) =>
   entry.personRole ?? entry.paidByRole;
 
+const SEED_YEAR = 2026;
+// Date months are zero-based, so 3 means April.
+const SEED_MONTH = 3;
+
+const seedTimestamp = (day: number, hour: number, minute: number) =>
+  new Date(SEED_YEAR, SEED_MONTH, day, hour, minute).getTime();
+
 const ledgers = [
   {
     id: '9fd958ee-e763-47ae-9ea1-78b3d89de625',
@@ -36,8 +46,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Morning coffee and pastry',
-    createdAt: 1770732720000,
-    updatedAt: 1770732720000,
+    createdAt: seedTimestamp(1, 9, 12),
+    updatedAt: seedTimestamp(1, 9, 12),
   },
   {
     id: 'a9223f99-5ca1-406d-9e02-8ed9db8d1ee5',
@@ -50,8 +60,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: true,
     note: 'Dinner at restaurant',
-    createdAt: 1770858900000,
-    updatedAt: 1770858900000,
+    createdAt: seedTimestamp(2, 10, 15),
+    updatedAt: seedTimestamp(2, 10, 15),
   },
   {
     id: '8a663030-2f30-411a-8414-af84a54ec2d7',
@@ -64,8 +74,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: true,
     note: 'Shared grocery run',
-    createdAt: 1770913800000,
-    updatedAt: 1770913800000,
+    createdAt: seedTimestamp(3, 11, 30),
+    updatedAt: seedTimestamp(3, 11, 30),
   },
   {
     id: 'db6ef8a4-a0b1-4896-81fc-701f2f54ff41',
@@ -78,8 +88,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: false,
     note: 'Paid phone bill for my line',
-    createdAt: 1771027500000,
-    updatedAt: 1771027500000,
+    createdAt: seedTimestamp(4, 14, 45),
+    updatedAt: seedTimestamp(4, 14, 45),
   },
   {
     id: '0739b24e-0572-41b8-acab-cecfeb8ebd10',
@@ -92,8 +102,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: true,
     note: 'Grocery run',
-    createdAt: 1771162800000,
-    updatedAt: 1771162800000,
+    createdAt: seedTimestamp(5, 16, 10),
+    updatedAt: seedTimestamp(5, 16, 10),
   },
   {
     id: '573df000-b3d4-4e80-9cb8-5596d8be9376',
@@ -106,8 +116,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: true,
     note: 'Weekend lunch with takeaway',
-    createdAt: 1771368300000,
-    updatedAt: 1771368300000,
+    createdAt: seedTimestamp(6, 9, 50),
+    updatedAt: seedTimestamp(6, 9, 50),
   },
   {
     id: '88034123-d051-473e-ab7f-3578d8902d52',
@@ -120,8 +130,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: true,
     note: 'Shared home supplies',
-    createdAt: 1771435800000,
-    updatedAt: 1771435800000,
+    createdAt: seedTimestamp(7, 10, 20),
+    updatedAt: seedTimestamp(7, 10, 20),
   },
   {
     id: '19d08eff-ab52-4f82-845c-8498afbd7dca',
@@ -134,8 +144,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: false,
     note: 'Settled balance after groceries',
-    createdAt: 1771631400000,
-    updatedAt: 1771631400000,
+    createdAt: seedTimestamp(8, 11, 40),
+    updatedAt: seedTimestamp(8, 11, 40),
   },
   {
     id: '6fc84a7a-53a6-4b61-815a-10f4058dc416',
@@ -148,8 +158,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Personal stationery pickup',
-    createdAt: 1771773600000,
-    updatedAt: 1771773600000,
+    createdAt: seedTimestamp(9, 13, 5),
+    updatedAt: seedTimestamp(9, 13, 5),
   },
   {
     id: 'cb833740-a2ba-445e-83d4-9a509dfe1584',
@@ -162,8 +172,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: true,
     note: 'Brunch and drinks',
-    createdAt: 1771985400000,
-    updatedAt: 1771985400000,
+    createdAt: seedTimestamp(10, 14, 25),
+    updatedAt: seedTimestamp(10, 14, 25),
   },
   {
     id: '58f8685a-2f1f-4931-adda-b44938c4639f',
@@ -176,8 +186,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: false,
     note: 'Paid internet bill',
-    createdAt: 1772139600000,
-    updatedAt: 1772139600000,
+    createdAt: seedTimestamp(11, 15, 35),
+    updatedAt: seedTimestamp(11, 15, 35),
   },
   {
     id: '1501a14a-207f-46a3-bd90-5ce54c04d6e6',
@@ -190,8 +200,8 @@ const ledgers = [
     paidByRole: SECONDARY_USER,
     isSplit: true,
     note: 'Shared hardware store pickup',
-    createdAt: 1772216100000,
-    updatedAt: 1772216100000,
+    createdAt: seedTimestamp(12, 16, 55),
+    updatedAt: seedTimestamp(12, 16, 55),
   },
   {
     id: 'f1f383f1-d51f-40ab-9da2-41d2289ab291',
@@ -204,8 +214,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Settled remaining amount',
-    createdAt: 1772583900000,
-    updatedAt: 1772583900000,
+    createdAt: seedTimestamp(13, 9, 15),
+    updatedAt: seedTimestamp(13, 9, 15),
   },
   {
     id: '9f4415d9-44f3-48fd-8f5d-4c3ca6d7ac5c',
@@ -218,8 +228,8 @@ const ledgers = [
     paidByRole: TERTIARY_USER,
     isSplit: false,
     note: 'Borrowed for rent',
-    createdAt: 1772632800000,
-    updatedAt: 1772632800000,
+    createdAt: seedTimestamp(14, 10, 30),
+    updatedAt: seedTimestamp(14, 10, 30),
   },
   {
     id: '58a10be8-b1c7-46bf-805b-bd6c4d551d6b',
@@ -232,8 +242,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Settled partial amount',
-    createdAt: 1772907600000,
-    updatedAt: 1772907600000,
+    createdAt: seedTimestamp(15, 11, 45),
+    updatedAt: seedTimestamp(15, 11, 45),
   },
   {
     id: '06e1e416-ee2b-4f91-9214-59bd1cb6a95a',
@@ -246,8 +256,8 @@ const ledgers = [
     paidByRole: TERTIARY_USER,
     isSplit: false,
     note: 'Borrowed for groceries and transit',
-    createdAt: 1773083400000,
-    updatedAt: 1773083400000,
+    createdAt: seedTimestamp(16, 13, 0),
+    updatedAt: seedTimestamp(16, 13, 0),
   },
   {
     id: 'eb770a6b-4758-40c0-acf4-aaa1f46a3b8a',
@@ -260,8 +270,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Settled remaining balance',
-    createdAt: 1773154800000,
-    updatedAt: 1773154800000,
+    createdAt: seedTimestamp(17, 14, 15),
+    updatedAt: seedTimestamp(17, 14, 15),
   },
   {
     id: '724fe650-7da2-4e88-a866-f4790c0891e1',
@@ -274,8 +284,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Covered insurance premium',
-    createdAt: 1773526500000,
-    updatedAt: 1773526500000,
+    createdAt: seedTimestamp(18, 15, 30),
+    updatedAt: seedTimestamp(18, 15, 30),
   },
   {
     id: '297c7ca5-5e4f-4ca2-a9c8-333c8f4546f6',
@@ -288,8 +298,8 @@ const ledgers = [
     paidByRole: TERTIARY_USER,
     isSplit: false,
     note: 'Settled partial amount',
-    createdAt: 1773840900000,
-    updatedAt: 1773840900000,
+    createdAt: seedTimestamp(19, 16, 45),
+    updatedAt: seedTimestamp(19, 16, 45),
   },
   {
     id: 'af40a61d-6d63-4d72-b552-39c5b2f74527',
@@ -302,8 +312,8 @@ const ledgers = [
     paidByRole: PRIMARY_USER,
     isSplit: false,
     note: 'Paid for repair parts',
-    createdAt: 1774375500000,
-    updatedAt: 1774375500000,
+    createdAt: seedTimestamp(20, 17, 0),
+    updatedAt: seedTimestamp(20, 17, 0),
   },
   {
     id: 'e6f4fd7a-5c70-45bf-b3bb-10e0f5a52d30',
@@ -316,8 +326,8 @@ const ledgers = [
     paidByRole: TERTIARY_USER,
     isSplit: false,
     note: 'Final settlement',
-    createdAt: 1774721700000,
-    updatedAt: 1774721700000,
+    createdAt: seedTimestamp(21, 18, 15),
+    updatedAt: seedTimestamp(21, 18, 15),
   },
 ] satisfies LedgerSeed[];
 

@@ -12,16 +12,12 @@ export type NavGroup = {
 
 export const sidebarData: NavGroup[] = [
   {
-    title: 'Tracker',
+    title: 'Expenses',
     url: '/',
     items: [
       {
-        title: 'Add Transaction',
-        url: '/add-transaction',
-      },
-      {
-        title: 'Recent transactions',
-        url: '/recent-transactions',
+        title: 'All expenses',
+        url: '/all-expenses',
       },
     ],
   },

@@ -2,7 +2,6 @@
 
 import { Moon, Sun } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '~/components/ui/button';
@@ -46,11 +45,7 @@ export function ThemeToggle() {
 
 export function Header() {
   const pathname = usePathname();
-
-  const title = useMemo(
-    () => getPageTitle(pathname, sidebarData) ?? 'Dashboard',
-    [pathname]
-  );
+  const title = getPageTitle(pathname, sidebarData) ?? 'Dashboard';
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-2">
