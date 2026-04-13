@@ -1,11 +1,11 @@
-import { and, desc, eq, gte, lt, or } from 'drizzle-orm';
+import { and, desc, eq, gte, lt } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/sqlite-core';
 
 import { type Month } from '~/lib/formatters/date';
 import { getMonthWindow } from '~/server/lib/date';
 import { db, ledgerEntry, user } from '~/server/db';
 
-export type ExpenseRecord = {
+export type LedgerEntryRecord = {
   id: string;
   type: (typeof ledgerEntry.$inferSelect)['type'];
   settlementFor: 'expense' | 'loan' | null;
@@ -20,38 +20,21 @@ export type ExpenseRecord = {
   createdAt: Date;
 };
 
-export type FetchExpensesByMonthParams = {
+export type FetchLedgerEntriesByMonthParams = {
   month: Month;
   year: number;
   timeZone: string;
-  includeSettlement?: boolean;
 };
 
 const personUser = alias(user, 'person_user');
 
-// Expense pages currently operate on a two-person domain: the session user and
-// one counterparty in the returned expense rows. Loan flows are separate.
-function getExpenseTypeFilter(includeSettlement: boolean) {
-  if (!includeSettlement) {
-    return eq(ledgerEntry.type, 'expense');
-  }
-
-  return or(
-    eq(ledgerEntry.type, 'expense'),
-    and(
-      eq(ledgerEntry.type, 'settlement'),
-      eq(ledgerEntry.settlementFor, 'expense')
-    )
-  );
-}
-
-export async function fetchExpensesByMonth(
-  params: FetchExpensesByMonthParams
-): Promise<ExpenseRecord[]> {
-  const { month, year, timeZone, includeSettlement = false } = params;
+export async function fetchLedgerEntriesByMonth(
+  params: FetchLedgerEntriesByMonthParams
+): Promise<LedgerEntryRecord[]> {
+  const { month, year, timeZone } = params;
   const { start, end } = getMonthWindow(month, timeZone, year);
 
-  const expenses = await db
+  const ledgerEntries = await db
     .select({
       id: ledgerEntry.id,
       type: ledgerEntry.type,
@@ -69,14 +52,8 @@ export async function fetchExpensesByMonth(
     .from(ledgerEntry)
     .leftJoin(personUser, eq(ledgerEntry.personId, personUser.id))
     .leftJoin(user, eq(ledgerEntry.paidByUserId, user.id))
-    .where(
-      and(
-        getExpenseTypeFilter(includeSettlement),
-        gte(ledgerEntry.createdAt, start),
-        lt(ledgerEntry.createdAt, end)
-      )
-    )
+    .where(and(gte(ledgerEntry.createdAt, start), lt(ledgerEntry.createdAt, end)))
     .orderBy(desc(ledgerEntry.createdAt));
 
-  return expenses;
+  return ledgerEntries;
 }

@@ -1,5 +1,10 @@
-export type { ExpenseRecord, FetchExpensesByMonthParams } from './ledger';
-export { fetchExpensesByMonth } from './ledger';
+export type {
+  FetchLedgerEntriesByMonthParams,
+  LedgerEntryRecord,
+} from './ledger';
+export { fetchLedgerEntriesByMonth } from './ledger';
+export type { ExpenseRecord, FetchExpensesByMonthParams } from './expense-query';
+export { fetchExpensesByMonth, selectExpenseRecords } from './expense-query';
 export type {
   CategorySummary,
   DashboardCounterparty,
