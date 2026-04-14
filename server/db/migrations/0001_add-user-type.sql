@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD `user_type` text DEFAULT 'expense' NOT NULL;

@@ -10,17 +10,7 @@ import {
 
 import { expenseCategoryValues } from '~/lib/expense-categories';
 
-// tracker tables
-export const ledgerEntryTypes = [
-  'expense',
-  'borrow',
-  'lend',
-  'settlement',
-] as const;
-
 export const ledgerEntryCategories = expenseCategoryValues;
-
-export const ledgerSettlementTargets = ['expense', 'loan'] as const;
 export const userTypes = ['expense', 'loan'] as const;
 export type UserType = (typeof userTypes)[number];
 
@@ -28,20 +18,14 @@ export const ledgerEntry = sqliteTable(
   'ledger_entry',
   {
     id: text('id').primaryKey(),
-    personId: text('person_id').references(() => user.id, {
-      onDelete: 'set null',
-    }),
-    type: text('type', { enum: ledgerEntryTypes }).notNull(),
-    category: text('category', { enum: ledgerEntryCategories }),
-    settlementFor: text('settlement_for', {
-      enum: ledgerSettlementTargets,
-    }),
+    category: text('category', { enum: ledgerEntryCategories }).notNull(),
     tags: text('tags'),
     amount: real('amount').notNull(),
-    paidByUserId: text('paid_by_user_id').references(() => user.id, {
-      onDelete: 'set null',
-    }),
-    isSplit: integer('is_split', { mode: 'boolean' }).default(false).notNull(),
+    paidByUserId: text('paid_by_user_id')
+      .notNull()
+      .references(() => user.id, {
+        onDelete: 'restrict',
+      }),
     note: text('note'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -58,34 +42,11 @@ export const ledgerEntry = sqliteTable(
       .references(() => user.id, { onDelete: 'restrict' }),
   },
   (table) => [
-    index('ledger_entry_person_id_idx').on(table.personId),
-    index('ledger_entry_type_idx').on(table.type),
     index('ledger_entry_category_idx').on(table.category),
-    index('ledger_entry_settlement_for_idx').on(table.settlementFor),
     index('ledger_entry_paid_by_user_id_idx').on(table.paidByUserId),
     index('ledger_entry_created_by_idx').on(table.createdBy),
     index('ledger_entry_updated_by_idx').on(table.updatedBy),
     check('ledger_entry_amount_positive_chk', sql`${table.amount} > 0`),
-    check(
-      'ledger_entry_split_type_chk',
-      sql`${table.type} = 'expense' or ${table.isSplit} = false`
-    ),
-    check(
-      'ledger_entry_category_type_chk',
-      sql`${table.type} = 'settlement' or ${table.category} is not null`
-    ),
-    check(
-      'ledger_entry_category_settlement_null_chk',
-      sql`${table.type} != 'settlement' or ${table.category} is null`
-    ),
-    check(
-      'ledger_entry_settlement_for_type_chk',
-      sql`${table.type} != 'settlement' or ${table.settlementFor} is not null`
-    ),
-    check(
-      'ledger_entry_settlement_for_null_chk',
-      sql`${table.type} = 'settlement' or ${table.settlementFor} is null`
-    ),
   ]
 );
 
@@ -181,7 +142,6 @@ export const verification = sqliteTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
-  personLedgerEntries: many(ledgerEntry, { relationName: 'personUser' }),
   createdLedgerEntries: many(ledgerEntry, { relationName: 'createdByUser' }),
   updatedLedgerEntries: many(ledgerEntry, { relationName: 'updatedByUser' }),
   paidLedgerEntries: many(ledgerEntry, { relationName: 'paidByUser' }),
@@ -202,11 +162,6 @@ export const accountRelations = relations(account, ({ one }) => ({
 }));
 
 export const ledgerEntryRelations = relations(ledgerEntry, ({ one }) => ({
-  personUser: one(user, {
-    fields: [ledgerEntry.personId],
-    references: [user.id],
-    relationName: 'personUser',
-  }),
   paidByUser: one(user, {
     fields: [ledgerEntry.paidByUserId],
     references: [user.id],

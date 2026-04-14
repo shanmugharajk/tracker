@@ -23,24 +23,21 @@ import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { formatCurrency } from '~/lib/formatters/currency';
 import { formatMonth, type Month } from '~/lib/formatters/date';
 import { cn } from '~/lib/cn';
-import type { ExpenseSummary, SettlementCopy } from '~/server/services/ledger';
+import type { ExpenseSummary } from '~/server/services/ledger';
 
 import { DashboardMetricsSkeleton } from './dashboard-card-skeleton';
-import { SettlementForm } from './settlement-form';
 
 type DashboardViewProps = {
   month: Month;
   year: number;
   summary: ExpenseSummary;
-  currentUserName: string;
-  counterpartyName: string;
-  settlement: SettlementCopy | null;
 };
 
 type SummaryTableProps = {
   title: string;
   action?: React.ReactNode;
   rows: Array<{
+    key?: string;
     label: string;
     value: string;
     tone?: 'default' | 'muted' | 'accent';
@@ -56,10 +53,10 @@ function SummaryTable({ title, action, rows }: SummaryTableProps) {
       </div>
 
       <div>
-        <Table>
+          <Table>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.label} className="border-0">
+              <TableRow key={row.key ?? row.label} className="border-0">
                 <TableCell
                   className={cn(
                     'px-2.5 py-1.5 text-sm',
@@ -90,9 +87,6 @@ export function DashboardView({
   month,
   year,
   summary,
-  currentUserName,
-  counterpartyName,
-  settlement,
 }: DashboardViewProps) {
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
@@ -101,42 +95,27 @@ export function DashboardView({
 
   const totalExpenseRows = [
     {
+      key: 'total-expense',
       label: 'Total expense',
       value: formatCurrency(summary.totalExpenses.total),
       tone: 'accent' as const,
     },
-    {
-      label: currentUserName,
-      value: formatCurrency(summary.participantExpenses.currentUserTotal),
-    },
-    {
-      label: counterpartyName,
-      value: formatCurrency(summary.participantExpenses.counterpartyTotal),
-    },
-  ];
-  const sharedExpenseRows = [
-    {
-      label: 'Total shared expense',
-      value: formatCurrency(summary.sharedExpenses.total),
-      tone: 'accent' as const,
-    },
-    {
-      label: `${currentUserName} paid`,
-      value: formatCurrency(summary.sharedExpenses.totalPaidByCurrentUser),
-    },
-    {
-      label: `${counterpartyName} paid`,
-      value: formatCurrency(summary.sharedExpenses.totalPaidByOtherUser),
-    },
+    ...summary.totalExpenses.paidByUserTotals.map((payer) => ({
+      key: payer.id,
+      label: payer.name,
+      value: formatCurrency(payer.total),
+    })),
   ];
   const categoryRows =
     summary.totalExpenses.topCategories.length > 0
       ? summary.totalExpenses.topCategories.map((category) => ({
+          key: category.name,
           label: category.name,
           value: formatCurrency(category.total),
         }))
       : [
           {
+            key: 'no-categories',
             label: 'No categories yet',
             value: formatCurrency(0),
             tone: 'muted' as const,
@@ -202,52 +181,21 @@ export function DashboardView({
         {isPending ? (
           <DashboardMetricsSkeleton />
         ) : (
-          <section
-            aria-label="Expense summary"
-            className="w-full space-y-3 pb-1"
-          >
-            <div className="grid gap-3 md:grid-cols-2">
-              <SummaryTable
-                title="Expense overview"
-                action={
-                  <Button asChild size="xs" className="h-7 px-2.5 text-xs">
-                    <Link href="/add-expense">
-                      <Plus className="size-3.5" />
-                      Add expense
-                    </Link>
-                  </Button>
-                }
-                rows={totalExpenseRows}
-              />
-
-              <SummaryTable title="Shared expense" rows={sharedExpenseRows} />
-            </div>
+          <section aria-label="Expense summary" className="w-full space-y-3 pb-1">
+            <SummaryTable
+              title="Expense overview"
+              action={
+                <Button asChild size="xs" className="h-7 px-2.5 text-xs">
+                  <Link href="/add-expense">
+                    <Plus className="size-3.5" />
+                    Add expense
+                  </Link>
+                </Button>
+              }
+              rows={totalExpenseRows}
+            />
 
             <SummaryTable title="Category wise expenses" rows={categoryRows} />
-
-            {settlement ? (
-              <section className="w-full rounded-3xl border border-border/60 bg-muted/30 px-4 py-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                      Settlement
-                    </p>
-                    <p className="text-sm font-medium">{settlement.text}</p>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 sm:justify-end">
-                    <p className="text-sm font-semibold">
-                      {formatCurrency(settlement.amount)}
-                    </p>
-
-                    <SettlementForm
-                      defaultAmount={settlement.amount}
-                      settlementText={settlement.text}
-                    />
-                  </div>
-                </div>
-              </section>
-            ) : null}
           </section>
         )}
       </CardContent>

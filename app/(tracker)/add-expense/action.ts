@@ -11,20 +11,12 @@ import { requireSession } from '~/server/lib/request';
 import { createExpenseLedgerEntry } from '~/server/services/expenses';
 import { fetchExpenseUsers } from '~/server/services/users';
 
-import {
-  formOpts,
-  addExpenseSchema,
-  resolveExpensePaidByUserId,
-} from './shared';
+import { addExpenseSchema, formOpts } from './shared';
 
 const serverValidateAddExpense = createServerValidate({
   ...formOpts,
   onServerValidate: addExpenseSchema as never,
 });
-
-function normalizeIsSplit(value: unknown) {
-  return value === true || value === 'true';
-}
 
 function normalizeText(value: string | undefined) {
   const trimmed = value?.trim();
@@ -39,39 +31,28 @@ export const addExpenseAction = async (
   try {
     const session = await requireSession();
     const values = await serverValidateAddExpense(formData);
-    const normalizedValues = {
-      ...values,
-      isSplit: normalizeIsSplit(values.isSplit),
-    };
     const expenseUsers = await fetchExpenseUsers();
+    const validPayerIds = new Set([
+      session.user.id,
+      ...expenseUsers.map((expenseUser) => expenseUser.id),
+    ]);
 
-    if (
-      normalizedValues.isSplit &&
-      !expenseUsers.some(
-        (expenseUser) => expenseUser.id === normalizedValues.paidByUserId
-      )
-    ) {
+    if (!validPayerIds.has(values.paidByUserId)) {
       return {
         errorMap: {
           onSubmit: {
-            form: 'Please choose a payer from the expense users list.',
+            form: 'Please choose a valid payer.',
           },
         },
       };
     }
 
     await createExpenseLedgerEntry({
-      personId: session.user.id,
-      category: normalizedValues.category,
-      tags: normalizeText(normalizedValues.tags),
-      amount: Number(normalizedValues.amount),
-      paidByUserId: resolveExpensePaidByUserId(
-        normalizedValues.isSplit,
-        normalizedValues.paidByUserId ?? '',
-        session.user.id
-      ),
-      isSplit: normalizedValues.isSplit,
-      note: normalizeText(normalizedValues.note),
+      category: values.category,
+      tags: normalizeText(values.tags),
+      amount: Number(values.amount),
+      paidByUserId: values.paidByUserId,
+      note: normalizeText(values.note),
       createdBy: session.user.id,
       updatedBy: session.user.id,
     });
@@ -82,12 +63,6 @@ export const addExpenseAction = async (
     if (error instanceof ServerValidateError) {
       return {
         ...error.formState,
-        values: error.formState.values
-          ? {
-              ...error.formState.values,
-              isSplit: normalizeIsSplit(error.formState.values.isSplit),
-            }
-          : error.formState.values,
       };
     }
 

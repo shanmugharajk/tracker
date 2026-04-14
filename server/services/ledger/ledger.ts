@@ -7,18 +7,16 @@ import { db, ledgerEntry, user } from '~/server/db';
 
 export type LedgerEntryRecord = {
   id: string;
-  type: (typeof ledgerEntry.$inferSelect)['type'];
-  settlementFor: 'expense' | 'loan' | null;
-  personId: string | null;
-  personName: string | null;
-  category: string | null;
+  category: string;
   tags: string | null;
   amount: number;
-  paidByUserId: string | null;
+  paidByUserId: string;
   paidByUserName: string | null;
-  isSplit: boolean;
+  note: string | null;
   createdAt: Date;
 };
+
+export type ExpenseRecord = LedgerEntryRecord;
 
 export type FetchLedgerEntriesByMonthParams = {
   month: Month;
@@ -26,7 +24,7 @@ export type FetchLedgerEntriesByMonthParams = {
   timeZone: string;
 };
 
-const personUser = alias(user, 'person_user');
+const paidByUser = alias(user, 'paid_by_user');
 
 export async function fetchLedgerEntriesByMonth(
   params: FetchLedgerEntriesByMonthParams
@@ -37,21 +35,16 @@ export async function fetchLedgerEntriesByMonth(
   const ledgerEntries = await db
     .select({
       id: ledgerEntry.id,
-      type: ledgerEntry.type,
-      settlementFor: ledgerEntry.settlementFor,
-      personId: ledgerEntry.personId,
-      personName: personUser.name,
       category: ledgerEntry.category,
       tags: ledgerEntry.tags,
       amount: ledgerEntry.amount,
       paidByUserId: ledgerEntry.paidByUserId,
-      paidByUserName: user.name,
-      isSplit: ledgerEntry.isSplit,
+      paidByUserName: paidByUser.name,
+      note: ledgerEntry.note,
       createdAt: ledgerEntry.createdAt,
     })
     .from(ledgerEntry)
-    .leftJoin(personUser, eq(ledgerEntry.personId, personUser.id))
-    .leftJoin(user, eq(ledgerEntry.paidByUserId, user.id))
+    .innerJoin(paidByUser, eq(ledgerEntry.paidByUserId, paidByUser.id))
     .where(and(gte(ledgerEntry.createdAt, start), lt(ledgerEntry.createdAt, end)))
     .orderBy(desc(ledgerEntry.createdAt));
 

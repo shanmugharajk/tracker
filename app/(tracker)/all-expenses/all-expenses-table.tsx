@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Split } from 'lucide-react';
 
 import { Badge } from '~/components/ui/badge';
 import { DataTable } from '~/components/ui/data-table';
@@ -24,24 +23,14 @@ function createAllExpensesColumns(
       header: 'Category',
       cell: ({ row }) => {
         const expense = row.original;
-        const category = expense.category ?? '-';
         const tags = expense.tags?.trim();
 
         return (
           <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-1">
             <div className="inline-flex items-center gap-1.5">
               <span className="font-medium text-[13px] text-foreground sm:text-sm">
-                {category}
+                {expense.category}
               </span>
-              {expense.isSplit ? (
-                <span
-                  className="inline-flex items-center justify-center text-muted-foreground/80"
-                  title="Split expense"
-                  aria-label="Split expense"
-                >
-                  <Split className="size-3.5 shrink-0" />
-                </span>
-              ) : null}
             </div>
             {tags ? (
               <Badge

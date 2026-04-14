@@ -1,5 +1,5 @@
 import { requireSession, resolveDateFilters } from '~/server/lib/request';
-import { fetchExpensesByMonth } from '~/server/services/ledger';
+import { fetchLedgerEntriesByMonth } from '~/server/services/ledger';
 
 import { AllExpensesView } from './all-expenses-view';
 
@@ -9,7 +9,7 @@ export default async function AllExpensesPage({
   const { month, year, timeZone } = await resolveDateFilters(searchParams);
   await requireSession();
 
-  const expenses = await fetchExpensesByMonth({
+  const expenses = await fetchLedgerEntriesByMonth({
     month,
     year,
     timeZone,

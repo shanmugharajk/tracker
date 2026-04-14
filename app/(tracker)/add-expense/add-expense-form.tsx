@@ -3,7 +3,6 @@
 import { useActionState } from 'react';
 
 import { initialFormState, useForm } from '@tanstack/react-form-nextjs';
-import { useStore } from '@tanstack/react-form';
 
 import { Button } from '~/components/ui/button';
 import { FieldGroup } from '~/components/ui/field';
@@ -15,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { Switch } from '~/components/ui/switch';
 import { Textarea } from '~/components/ui/textarea';
 import {
   Card,
@@ -30,14 +28,22 @@ import { SubmitButton } from '~/lib/forms/submit-button';
 import { useServerFormOptions } from '~/lib/forms/server-form';
 
 import { addExpenseAction } from './action';
-import { expenseCategories, formOpts, addExpenseSchema } from './shared';
-import type { ExpenseUserRecord } from '~/server/services/users';
+import {
+  addExpenseDefaultValues,
+  addExpenseSchema,
+  expenseCategories,
+  formOpts,
+} from './shared';
 
 type AddExpenseFormProps = {
-  users: ExpenseUserRecord[];
+  users: Array<{
+    id: string;
+    name: string;
+  }>;
+  currentUserId: string;
 };
 
-export function AddExpenseForm({ users }: AddExpenseFormProps) {
+export function AddExpenseForm({ users, currentUserId }: AddExpenseFormProps) {
   const [state, action, pending] = useActionState(
     addExpenseAction,
     initialFormState
@@ -45,10 +51,12 @@ export function AddExpenseForm({ users }: AddExpenseFormProps) {
 
   const form = useForm({
     ...formOpts,
+    defaultValues: {
+      ...addExpenseDefaultValues,
+      paidByUserId: currentUserId,
+    },
     ...useServerFormOptions(addExpenseSchema, state),
   });
-
-  const isSplit = useStore(form.store, (store) => store.values.isSplit);
 
   return (
     <Card className="overflow-hidden">
@@ -132,6 +140,43 @@ export function AddExpenseForm({ users }: AddExpenseFormProps) {
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 fieldComponent={form.Field}
+                name="paidByUserId"
+                label="Paid by"
+                render={({
+                  name,
+                  value,
+                  handleBlur,
+                  handleChange,
+                  invalid,
+                  errorId,
+                }) => (
+                  <Select
+                    name={name}
+                    value={value ?? ''}
+                    onValueChange={(nextValue) => {
+                      handleChange(nextValue);
+                      handleBlur();
+                    }}
+                  >
+                    <SelectTrigger
+                      aria-invalid={invalid}
+                      aria-describedby={invalid ? errorId : undefined}
+                    >
+                      <SelectValue placeholder="Choose who paid" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+
+              <FormField
+                fieldComponent={form.Field}
                 name="tags"
                 label="Tags"
                 render={({
@@ -183,77 +228,6 @@ export function AddExpenseForm({ users }: AddExpenseFormProps) {
                   />
                 )}
               />
-
-              <FormField
-                fieldComponent={form.Field}
-                name="isSplit"
-                label="Split expense"
-                render={({ name, value, handleChange, handleBlur }) => (
-                  <div className="flex items-center justify-between gap-4 rounded-3xl border border-transparent bg-input/40 px-4 py-3">
-                    <input
-                      type="hidden"
-                      name={name}
-                      value={String(Boolean(value))}
-                    />
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Split this expense</p>
-                      <p className="text-sm text-muted-foreground">
-                        Enable this when the amount is shared.
-                      </p>
-                    </div>
-                    <Switch
-                      checked={value === true || value === 'true'}
-                      onCheckedChange={(checked) => {
-                        handleChange(checked);
-                        handleBlur();
-
-                        if (!checked) {
-                          form.setFieldValue('paidByUserId', '');
-                        }
-                      }}
-                    />
-                  </div>
-                )}
-              />
-
-              {isSplit ? (
-                <FormField
-                  fieldComponent={form.Field}
-                  name="paidByUserId"
-                  label="Paid by"
-                  render={({
-                    name,
-                    value,
-                    handleBlur,
-                    handleChange,
-                    invalid,
-                    errorId,
-                  }) => (
-                    <Select
-                      name={name}
-                      value={value ?? ''}
-                      onValueChange={(nextValue) => {
-                        handleChange(nextValue);
-                        handleBlur();
-                      }}
-                    >
-                      <SelectTrigger
-                        aria-invalid={invalid}
-                        aria-describedby={invalid ? errorId : undefined}
-                      >
-                        <SelectValue placeholder="Choose an expense user" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              ) : null}
             </div>
 
             <div className="w-fit">
