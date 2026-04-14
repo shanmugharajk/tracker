@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f030c4d3-4381-4df2-a1cf-539ff4e7f45b",
+  "id": "904cf84d-d895-460f-b890-783b804760f8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -128,8 +128,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "ledger_entry": {
-      "name": "ledger_entry",
+    "expense_entry": {
+      "name": "expense_entry",
       "columns": {
         "id": {
           "name": "id",
@@ -205,29 +205,29 @@
         }
       },
       "indexes": {
-        "ledger_entry_category_idx": {
-          "name": "ledger_entry_category_idx",
+        "expense_entry_category_idx": {
+          "name": "expense_entry_category_idx",
           "columns": [
             "category"
           ],
           "isUnique": false
         },
-        "ledger_entry_paid_by_user_id_idx": {
-          "name": "ledger_entry_paid_by_user_id_idx",
+        "expense_entry_paid_by_user_id_idx": {
+          "name": "expense_entry_paid_by_user_id_idx",
           "columns": [
             "paid_by_user_id"
           ],
           "isUnique": false
         },
-        "ledger_entry_created_by_idx": {
-          "name": "ledger_entry_created_by_idx",
+        "expense_entry_created_by_idx": {
+          "name": "expense_entry_created_by_idx",
           "columns": [
             "created_by"
           ],
           "isUnique": false
         },
-        "ledger_entry_updated_by_idx": {
-          "name": "ledger_entry_updated_by_idx",
+        "expense_entry_updated_by_idx": {
+          "name": "expense_entry_updated_by_idx",
           "columns": [
             "updated_by"
           ],
@@ -235,9 +235,9 @@
         }
       },
       "foreignKeys": {
-        "ledger_entry_paid_by_user_id_user_id_fk": {
-          "name": "ledger_entry_paid_by_user_id_user_id_fk",
-          "tableFrom": "ledger_entry",
+        "expense_entry_paid_by_user_id_user_id_fk": {
+          "name": "expense_entry_paid_by_user_id_user_id_fk",
+          "tableFrom": "expense_entry",
           "tableTo": "user",
           "columnsFrom": [
             "paid_by_user_id"
@@ -248,9 +248,9 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "ledger_entry_created_by_user_id_fk": {
-          "name": "ledger_entry_created_by_user_id_fk",
-          "tableFrom": "ledger_entry",
+        "expense_entry_created_by_user_id_fk": {
+          "name": "expense_entry_created_by_user_id_fk",
+          "tableFrom": "expense_entry",
           "tableTo": "user",
           "columnsFrom": [
             "created_by"
@@ -261,9 +261,9 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "ledger_entry_updated_by_user_id_fk": {
-          "name": "ledger_entry_updated_by_user_id_fk",
-          "tableFrom": "ledger_entry",
+        "expense_entry_updated_by_user_id_fk": {
+          "name": "expense_entry_updated_by_user_id_fk",
+          "tableFrom": "expense_entry",
           "tableTo": "user",
           "columnsFrom": [
             "updated_by"
@@ -278,9 +278,9 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
-        "ledger_entry_amount_positive_chk": {
-          "name": "ledger_entry_amount_positive_chk",
-          "value": "\"ledger_entry\".\"amount\" > 0"
+        "expense_entry_amount_positive_chk": {
+          "name": "expense_entry_amount_positive_chk",
+          "value": "\"expense_entry\".\"amount\" > 0"
         }
       }
     },

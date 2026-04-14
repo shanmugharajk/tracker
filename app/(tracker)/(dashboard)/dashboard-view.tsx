@@ -23,7 +23,7 @@ import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { formatCurrency } from '~/lib/formatters/currency';
 import { formatMonth, type Month } from '~/lib/formatters/date';
 import { cn } from '~/lib/cn';
-import type { ExpenseSummary } from '~/server/services/ledger';
+import type { ExpenseSummary } from '~/server/services/expense';
 
 import { DashboardMetricsSkeleton } from './dashboard-card-skeleton';
 

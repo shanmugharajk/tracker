@@ -10,15 +10,15 @@ import {
 
 import { expenseCategoryValues } from '~/lib/expense-categories';
 
-export const ledgerEntryCategories = expenseCategoryValues;
+export const expenseEntryCategories = expenseCategoryValues;
 export const userTypes = ['expense', 'loan'] as const;
 export type UserType = (typeof userTypes)[number];
 
-export const ledgerEntry = sqliteTable(
-  'ledger_entry',
+export const expenseEntry = sqliteTable(
+  'expense_entry',
   {
     id: text('id').primaryKey(),
-    category: text('category', { enum: ledgerEntryCategories }).notNull(),
+    category: text('category', { enum: expenseEntryCategories }).notNull(),
     tags: text('tags'),
     amount: real('amount').notNull(),
     paidByUserId: text('paid_by_user_id')
@@ -42,11 +42,11 @@ export const ledgerEntry = sqliteTable(
       .references(() => user.id, { onDelete: 'restrict' }),
   },
   (table) => [
-    index('ledger_entry_category_idx').on(table.category),
-    index('ledger_entry_paid_by_user_id_idx').on(table.paidByUserId),
-    index('ledger_entry_created_by_idx').on(table.createdBy),
-    index('ledger_entry_updated_by_idx').on(table.updatedBy),
-    check('ledger_entry_amount_positive_chk', sql`${table.amount} > 0`),
+    index('expense_entry_category_idx').on(table.category),
+    index('expense_entry_paid_by_user_id_idx').on(table.paidByUserId),
+    index('expense_entry_created_by_idx').on(table.createdBy),
+    index('expense_entry_updated_by_idx').on(table.updatedBy),
+    check('expense_entry_amount_positive_chk', sql`${table.amount} > 0`),
   ]
 );
 
@@ -142,9 +142,9 @@ export const verification = sqliteTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
-  createdLedgerEntries: many(ledgerEntry, { relationName: 'createdByUser' }),
-  updatedLedgerEntries: many(ledgerEntry, { relationName: 'updatedByUser' }),
-  paidLedgerEntries: many(ledgerEntry, { relationName: 'paidByUser' }),
+  createdExpenseEntries: many(expenseEntry, { relationName: 'createdByUser' }),
+  updatedExpenseEntries: many(expenseEntry, { relationName: 'updatedByUser' }),
+  paidExpenseEntries: many(expenseEntry, { relationName: 'paidByUser' }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -161,19 +161,19 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-export const ledgerEntryRelations = relations(ledgerEntry, ({ one }) => ({
+export const expenseEntryRelations = relations(expenseEntry, ({ one }) => ({
   paidByUser: one(user, {
-    fields: [ledgerEntry.paidByUserId],
+    fields: [expenseEntry.paidByUserId],
     references: [user.id],
     relationName: 'paidByUser',
   }),
   createdByUser: one(user, {
-    fields: [ledgerEntry.createdBy],
+    fields: [expenseEntry.createdBy],
     references: [user.id],
     relationName: 'createdByUser',
   }),
   updatedByUser: one(user, {
-    fields: [ledgerEntry.updatedBy],
+    fields: [expenseEntry.updatedBy],
     references: [user.id],
     relationName: 'updatedByUser',
   }),

@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { requireSession } from '~/server/lib/request';
-import { createExpenseLedgerEntry } from '~/server/services/expenses';
+import { createExpenseEntry } from '~/server/services/expenses';
 import { fetchExpenseUsers } from '~/server/services/users';
 
 import { addExpenseSchema, formOpts } from './shared';
@@ -47,7 +47,7 @@ export const addExpenseAction = async (
       };
     }
 
-    await createExpenseLedgerEntry({
+    await createExpenseEntry({
       category: values.category,
       tags: normalizeText(values.tags),
       amount: Number(values.amount),

@@ -1,4 +1,4 @@
-import type { ExpenseRecord } from './ledger';
+import type { ExpenseRecord } from './expense';
 
 export type CategorySummary = {
   name: string;

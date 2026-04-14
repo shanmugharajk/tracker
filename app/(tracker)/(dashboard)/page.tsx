@@ -1,8 +1,8 @@
 import { requireSession, resolveDateFilters } from '~/server/lib/request';
 import {
-  fetchLedgerEntriesByMonth,
+  fetchExpenseEntriesByMonth,
   summarizeExpenses,
-} from '~/server/services/ledger';
+} from '~/server/services/expense';
 
 import { DashboardView } from './dashboard-view';
 
@@ -10,7 +10,7 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
   const { month, year, timeZone } = await resolveDateFilters(searchParams);
   await requireSession();
 
-  const expenses = await fetchLedgerEntriesByMonth({ month, year, timeZone });
+  const expenses = await fetchExpenseEntriesByMonth({ month, year, timeZone });
   const summary = summarizeExpenses(expenses);
 
   return (

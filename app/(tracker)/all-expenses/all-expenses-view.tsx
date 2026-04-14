@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { type Month } from '~/lib/formatters/date';
-import type { ExpenseRecord } from '~/server/services/ledger';
+import type { ExpenseRecord } from '~/server/services/expense';
 
 import { AllExpensesFilters } from './all-expenses-filters';
 import { AllExpensesTable } from './all-expenses-table';

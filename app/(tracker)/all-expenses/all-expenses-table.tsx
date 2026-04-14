@@ -7,7 +7,7 @@ import { Badge } from '~/components/ui/badge';
 import { DataTable } from '~/components/ui/data-table';
 import { formatCurrency } from '~/lib/formatters/currency';
 import { formatDateTimeParts } from '~/lib/formatters/date-time';
-import type { ExpenseRecord } from '~/server/services/ledger';
+import type { ExpenseRecord } from '~/server/services/expense';
 
 type AllExpensesTableProps = {
   data: ExpenseRecord[];

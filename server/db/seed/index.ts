@@ -1,10 +1,10 @@
 import { seedUser } from './user';
-import { seedLedgerEntries } from './ledger';
+import { seedExpenseEntries } from './expense';
 
 async function seed() {
   console.log('\n🚀 Seeding started');
   const userIds = await seedUser();
-  await seedLedgerEntries(userIds);
+  await seedExpenseEntries(userIds);
 }
 
 seed()

@@ -6,13 +6,11 @@ import type { UserType } from '~/server/db/schema';
 
 import { SEED_USER_ROLES, type SeedUserIds } from './shared';
 
-export type SeedUserNames = readonly [string, string, string];
-
 export const createSeedEmail = (username: string) =>
   `${username.trim().toLowerCase()}@mail.com`;
 
 export async function seedUser(
-  userNames: SeedUserNames = env.SEED_USER_NAMES
+  userNames: string[] = env.SEED_USER_NAMES
 ): Promise<SeedUserIds> {
   const seededUsers = {} as SeedUserIds;
   const userTypes: [UserType, UserType, UserType] = [
@@ -37,10 +35,7 @@ export async function seedUser(
 
     const userType = userTypes[index];
 
-    await db
-      .update(user)
-      .set({ userType })
-      .where(eq(user.id, result.user.id));
+    await db.update(user).set({ userType }).where(eq(user.id, result.user.id));
 
     seededUsers[SEED_USER_ROLES[index]] = result.user.id;
   }

@@ -1,11 +1,8 @@
-import { db, ledgerEntry } from '~/server/db';
+import { db, expenseEntry } from '~/server/db';
 
 import { SEED_USER_ROLES, type SeedUserIds, type SeedUserRole } from './shared';
 
-// Seed fixtures intentionally use the server runtime timezone. These values are
-// not user-facing timezone data, so we keep them simple and do not normalize
-// them through a separate timezone layer.
-type LedgerSeed = {
+type ExpenseSeed = {
   id: string;
   category: 'Groceries' | 'Restaurants' | 'Bills' | 'Home' | 'Shopping';
   tags: string | null;
@@ -19,16 +16,15 @@ type LedgerSeed = {
 const PRIMARY_USER = SEED_USER_ROLES[0];
 const SECONDARY_USER = SEED_USER_ROLES[1];
 
-const resolveAuditRole = (entry: LedgerSeed) => entry.paidByRole;
+const resolveAuditRole = (entry: ExpenseSeed) => entry.paidByRole;
 
 const SEED_YEAR = 2026;
-// Date months are zero-based, so 3 means April.
 const SEED_MONTH = 3;
 
 const seedTimestamp = (day: number, hour: number, minute: number) =>
   new Date(SEED_YEAR, SEED_MONTH, day, hour, minute).getTime();
 
-const ledgers = [
+const expenses = [
   {
     id: '9fd958ee-e763-47ae-9ea1-78b3d89de625',
     category: 'Restaurants',
@@ -119,10 +115,10 @@ const ledgers = [
     createdAt: seedTimestamp(9, 15, 35),
     updatedAt: seedTimestamp(9, 15, 35),
   },
-] satisfies LedgerSeed[];
+] satisfies ExpenseSeed[];
 
-export async function seedLedgerEntries(userIds: SeedUserIds) {
-  const resolvedLedgers = ledgers.map((entry) => ({
+export async function seedExpenseEntries(userIds: SeedUserIds) {
+  const resolvedExpenses = expenses.map((entry) => ({
     id: entry.id,
     category: entry.category,
     tags: entry.tags,
@@ -135,6 +131,6 @@ export async function seedLedgerEntries(userIds: SeedUserIds) {
     updatedBy: userIds[resolveAuditRole(entry)],
   }));
 
-  await db.insert(ledgerEntry).values(resolvedLedgers).onConflictDoNothing();
-  console.log(`🌱 Seeded ledger entries: ${resolvedLedgers.length}`);
+  await db.insert(expenseEntry).values(resolvedExpenses).onConflictDoNothing();
+  console.log(`🌱 Seeded expense entries: ${resolvedExpenses.length}`);
 }

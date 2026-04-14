@@ -1,7 +1,7 @@
-import { db, ledgerEntry } from '~/server/db';
+import { db, expenseEntry } from '~/server/db';
 import type { AddExpenseFormValues } from '~/app/(tracker)/add-expense/shared';
 
-type CreateExpenseLedgerEntryInput = {
+type CreateExpenseEntryInput = {
   category: AddExpenseFormValues['category'];
   tags: string | null;
   amount: number;
@@ -11,12 +11,12 @@ type CreateExpenseLedgerEntryInput = {
   updatedBy: string;
 };
 
-export async function createExpenseLedgerEntry(
-  input: CreateExpenseLedgerEntryInput
+export async function createExpenseEntry(
+  input: CreateExpenseEntryInput
 ) {
   const now = new Date();
 
-  await db.insert(ledgerEntry).values({
+  await db.insert(expenseEntry).values({
     id: crypto.randomUUID(),
     category: input.category,
     tags: input.tags,
