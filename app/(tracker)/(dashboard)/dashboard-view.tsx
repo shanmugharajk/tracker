@@ -23,10 +23,7 @@ import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { formatCurrency } from '~/lib/formatters/currency';
 import { formatMonth, type Month } from '~/lib/formatters/date';
 import { cn } from '~/lib/cn';
-import type {
-  ExpenseSummary,
-  SettlementCopy,
-} from '~/server/services/ledger';
+import type { ExpenseSummary, SettlementCopy } from '~/server/services/ledger';
 
 import { DashboardMetricsSkeleton } from './dashboard-card-skeleton';
 import { SettlementForm } from './settlement-form';
@@ -132,7 +129,7 @@ export function DashboardView({
       value: formatCurrency(summary.sharedExpenses.totalPaidByOtherUser),
     },
   ];
-  const topCategoryRows =
+  const categoryRows =
     summary.totalExpenses.topCategories.length > 0
       ? summary.totalExpenses.topCategories.map((category) => ({
           label: category.name,
@@ -160,7 +157,10 @@ export function DashboardView({
   }
 
   return (
-    <Card size="sm" className="flex h-full min-h-0 w-full flex-1 flex-col shadow-sm">
+    <Card
+      size="sm"
+      className="flex h-full min-h-0 w-full flex-1 flex-col shadow-sm"
+    >
       <CardHeader>
         <CardTitle>{`${formatMonth(month)} ${year} - Expenses`}</CardTitle>
 
@@ -223,7 +223,7 @@ export function DashboardView({
               <SummaryTable title="Shared expense" rows={sharedExpenseRows} />
             </div>
 
-            <SummaryTable title="Top 3 categories" rows={topCategoryRows} />
+            <SummaryTable title="Category wise expenses" rows={categoryRows} />
 
             {settlement ? (
               <section className="w-full rounded-3xl border border-border/60 bg-muted/30 px-4 py-3">

@@ -79,18 +79,20 @@ describe('summarizeExpenses', () => {
 
     expect(summary.totalExpenses.total).toBe(170);
     expect(summary.totalExpenses.individualTotal).toBe(50);
-    expect(summary.totalExpenses.topCategories.length).toBe(3);
+    expect(summary.totalExpenses.topCategories.length).toBe(4);
     expect(summary.totalExpenses.topCategories[0]?.name).toBe('Groceries');
     expect(summary.totalExpenses.topCategories[0]?.total).toBe(80);
     expect(summary.totalExpenses.topCategories[1]?.name).toBe('Bills');
     expect(summary.totalExpenses.topCategories[1]?.total).toBe(40);
     expect(summary.totalExpenses.topCategories[2]?.name).toBe('Restaurants');
     expect(summary.totalExpenses.topCategories[2]?.total).toBe(30);
+    expect(summary.totalExpenses.topCategories[3]?.name).toBe('Shopping');
+    expect(summary.totalExpenses.topCategories[3]?.total).toBe(20);
     expect(summary.sharedExpenses.total).toBe(120);
     expect(summary.sharedExpenses.expensePerPerson).toBe(60);
     expect(summary.sharedExpenses.totalPaidByCurrentUser).toBe(80);
-    expect(summary.sharedExpenses.totalPaidByOtherUser).toBe(40);
-    expect(summary.sharedExpenses.balance).toBe(10);
+    expect(summary.sharedExpenses.totalPaidByOtherUser).toBe(50);
+    expect(summary.sharedExpenses.balance).toBe(30);
     expect(summary.sharedExpenses.counterparty.id).toBe(OTHER_USER_ID);
     expect(summary.sharedExpenses.counterparty.name).toBe('Alex');
     expect(summary.participantExpenses.currentUserTotal).toBe(90);
@@ -185,7 +187,7 @@ describe('summarizeExpenses', () => {
       CURRENT_USER_ID
     );
 
-    expect(summary.sharedExpenses.balance).toBe(0);
+    expect(summary.sharedExpenses.balance).toBe(40);
     expect(summary.sharedExpenses.counterparty.id).toBe(OTHER_USER_ID);
     expect(summary.sharedExpenses.counterparty.name).toBe('Alex');
   });

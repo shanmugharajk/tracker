@@ -3,7 +3,10 @@ export type {
   LedgerEntryRecord,
 } from './ledger';
 export { fetchLedgerEntriesByMonth } from './ledger';
-export type { ExpenseRecord, FetchExpensesByMonthParams } from './expense-query';
+export type {
+  ExpenseRecord,
+  FetchExpensesByMonthParams,
+} from './expense-query';
 export { fetchExpensesByMonth, selectExpenseRecords } from './expense-query';
 export type {
   CategorySummary,
@@ -14,4 +17,7 @@ export type {
   SharedExpenseSummary,
   TotalExpenseSummary,
 } from './expense-summary';
-export { getSettlementCopy, summarizeExpenses } from './expense-summary';
+export {
+  getSettlement as getSettlementCopy,
+  summarizeExpenses,
+} from './expense-summary';

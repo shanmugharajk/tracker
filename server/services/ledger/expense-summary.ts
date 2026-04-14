@@ -51,7 +51,7 @@ function sumAmounts(entries: ExpenseRecord[]) {
   );
 }
 
-function getTopCategories(entries: ExpenseRecord[]): CategorySummary[] {
+function getCategorySummaries(entries: ExpenseRecord[]): CategorySummary[] {
   const categoryTotals = new Map<string, number>();
 
   for (const entry of entries) {
@@ -72,8 +72,7 @@ function getTopCategories(entries: ExpenseRecord[]): CategorySummary[] {
     .sort(
       (left, right) =>
         right.total - left.total || left.name.localeCompare(right.name)
-    )
-    .slice(0, 3);
+    );
 }
 
 function getCounterpartyCandidates(
@@ -109,7 +108,13 @@ function getDashboardCounterparty(
   currentUserId: string
 ): DashboardCounterparty {
   // Expense dashboard is intentionally a session-user vs one-counterparty view.
-  const [counterparty] = getCounterpartyCandidates(entries, currentUserId);
+  const counterpartyCandidates = getCounterpartyCandidates(
+    entries,
+    currentUserId
+  );
+  const counterparty =
+    counterpartyCandidates.find((candidate) => candidate.name?.trim()) ??
+    counterpartyCandidates[0];
 
   return counterparty ?? { id: null, name: null };
 }
@@ -159,7 +164,7 @@ function summarizeSharedBalance(
   return roundCurrency(balance);
 }
 
-export function getSettlementCopy(
+export function getSettlement(
   balance: number,
   currentUserName: string,
   counterpartyName: string
@@ -201,12 +206,20 @@ export function summarizeExpenses(
   );
 
   const totalPaidByCurrentUser = sumAmounts(
-    splitExpenseEntries.filter((entry) => entry.paidByUserId === currentUserId)
+    entries.filter(
+      (entry) =>
+        entry.paidByUserId === currentUserId &&
+        (entry.type === 'settlement' ||
+          (entry.type === 'expense' && entry.isSplit))
+    )
   );
   const totalPaidByOtherUser = sumAmounts(
-    splitExpenseEntries.filter(
+    entries.filter(
       (entry) =>
-        Boolean(counterparty.id) && entry.paidByUserId === counterparty.id
+        Boolean(counterparty.id) &&
+        entry.paidByUserId === counterparty.id &&
+        (entry.type === 'settlement' ||
+          (entry.type === 'expense' && entry.isSplit))
     )
   );
   const sharedTotal = sumAmounts(splitExpenseEntries);
@@ -216,7 +229,7 @@ export function summarizeExpenses(
     totalExpenses: {
       total: sumAmounts(expenseEntries),
       individualTotal: sumAmounts(individualExpenseEntries),
-      topCategories: getTopCategories(expenseEntries),
+      topCategories: getCategorySummaries(expenseEntries),
     },
     sharedExpenses: {
       total: sharedTotal,

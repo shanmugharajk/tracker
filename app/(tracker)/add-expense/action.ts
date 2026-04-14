@@ -106,5 +106,5 @@ export const addExpenseAction = async (
     };
   }
 
-  redirect('/all-expenses');
+  redirect('/');
 };

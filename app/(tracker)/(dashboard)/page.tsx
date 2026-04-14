@@ -4,6 +4,7 @@ import {
   getSettlementCopy,
   summarizeExpenses,
 } from '~/server/services/ledger';
+import { fetchExpenseUsers } from '~/server/services/users';
 
 import { DashboardView } from './dashboard-view';
 
@@ -17,11 +18,14 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
     timeZone,
     includeSettlement: true,
   });
+  const expenseUsers = await fetchExpenseUsers();
+  const otherUser = expenseUsers.find((user) => user.id !== session.user.id);
 
   const summary = summarizeExpenses(expenses, session.user.id);
   const currentUserName = session.user.name.trim();
-  const counterpartyName =
-    summary.sharedExpenses.counterparty.name?.trim() || 'Other person';
+
+  const counterpartyName = otherUser?.name ?? 'Other user';
+
   const settlement = getSettlementCopy(
     summary.sharedExpenses.balance,
     currentUserName,
