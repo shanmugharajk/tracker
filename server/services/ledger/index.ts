@@ -9,7 +9,9 @@ export type {
   CategorySummary,
   DashboardCounterparty,
   ExpenseSummary,
+  ParticipantExpenseSummary,
+  SettlementCopy,
   SharedExpenseSummary,
   TotalExpenseSummary,
 } from './expense-summary';
-export { summarizeExpenses } from './expense-summary';
+export { getSettlementCopy, summarizeExpenses } from './expense-summary';

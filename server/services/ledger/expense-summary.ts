@@ -16,6 +16,16 @@ export type TotalExpenseSummary = {
   topCategories: CategorySummary[];
 };
 
+export type ParticipantExpenseSummary = {
+  currentUserTotal: number;
+  counterpartyTotal: number;
+};
+
+export type SettlementCopy = {
+  text: string;
+  amount: number;
+};
+
 export type SharedExpenseSummary = {
   total: number;
   expensePerPerson: number;
@@ -28,6 +38,7 @@ export type SharedExpenseSummary = {
 export type ExpenseSummary = {
   totalExpenses: TotalExpenseSummary;
   sharedExpenses: SharedExpenseSummary;
+  participantExpenses: ParticipantExpenseSummary;
 };
 
 function roundCurrency(value: number) {
@@ -103,6 +114,30 @@ function getDashboardCounterparty(
   return counterparty ?? { id: null, name: null };
 }
 
+function entryBelongsToUser(entry: ExpenseRecord, userId: string) {
+  return entry.paidByUserId === userId || entry.personId === userId;
+}
+
+function sumIndividualExpenseTotals(
+  entries: ExpenseRecord[],
+  currentUserId: string,
+  counterpartyId: string | null
+) {
+  const currentUserTotal = sumAmounts(
+    entries.filter((entry) => entryBelongsToUser(entry, currentUserId))
+  );
+  const counterpartyTotal = counterpartyId
+    ? sumAmounts(
+        entries.filter((entry) => entryBelongsToUser(entry, counterpartyId))
+      )
+    : 0;
+
+  return {
+    currentUserTotal,
+    counterpartyTotal,
+  };
+}
+
 function summarizeSharedBalance(
   sharedExpenseEntries: ExpenseRecord[],
   settlementEntries: ExpenseRecord[],
@@ -124,6 +159,28 @@ function summarizeSharedBalance(
   return roundCurrency(balance);
 }
 
+export function getSettlementCopy(
+  balance: number,
+  currentUserName: string,
+  counterpartyName: string
+): SettlementCopy | null {
+  if (balance === 0) {
+    return null;
+  }
+
+  if (balance > 0) {
+    return {
+      text: `${counterpartyName} owes ${currentUserName}`,
+      amount: Math.abs(balance),
+    };
+  }
+
+  return {
+    text: `${currentUserName} owes ${counterpartyName}`,
+    amount: Math.abs(balance),
+  };
+}
+
 export function summarizeExpenses(
   entries: ExpenseRecord[],
   currentUserId: string
@@ -137,6 +194,11 @@ export function summarizeExpenses(
   const expenseSettlementEntries = entries.filter(
     (entry) => entry.type === 'settlement' && entry.settlementFor === 'expense'
   );
+  const participantExpenses = sumIndividualExpenseTotals(
+    individualExpenseEntries,
+    currentUserId,
+    counterparty.id
+  );
 
   const totalPaidByCurrentUser = sumAmounts(
     splitExpenseEntries.filter((entry) => entry.paidByUserId === currentUserId)
@@ -148,6 +210,7 @@ export function summarizeExpenses(
     )
   );
   const sharedTotal = sumAmounts(splitExpenseEntries);
+  const sharedPerPerson = roundCurrency(sharedTotal / 2);
 
   return {
     totalExpenses: {
@@ -157,7 +220,7 @@ export function summarizeExpenses(
     },
     sharedExpenses: {
       total: sharedTotal,
-      expensePerPerson: roundCurrency(sharedTotal / 2),
+      expensePerPerson: sharedPerPerson,
       totalPaidByCurrentUser,
       totalPaidByOtherUser,
       balance: summarizeSharedBalance(
@@ -166,6 +229,11 @@ export function summarizeExpenses(
         currentUserId
       ),
       counterparty,
+    },
+    participantExpenses: {
+      currentUserTotal: participantExpenses.currentUserTotal + sharedPerPerson,
+      counterpartyTotal:
+        participantExpenses.counterpartyTotal + sharedPerPerson,
     },
   };
 }

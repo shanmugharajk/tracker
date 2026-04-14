@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTransition } from 'react';
-import { MoreHorizontal, Plus, User } from 'lucide-react';
+import { MoreHorizontal, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '~/components/ui/button';
@@ -19,115 +19,131 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
+import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { formatCurrency } from '~/lib/formatters/currency';
 import { formatMonth, type Month } from '~/lib/formatters/date';
 import { cn } from '~/lib/cn';
-import type { ExpenseSummary } from '~/server/services/ledger';
+import type {
+  ExpenseSummary,
+  SettlementCopy,
+} from '~/server/services/ledger';
 
 import { DashboardMetricsSkeleton } from './dashboard-card-skeleton';
-import { formatCurrency } from '~/lib/formatters/currency';
 
 type DashboardViewProps = {
   month: Month;
   year: number;
   summary: ExpenseSummary;
+  currentUserName: string;
+  counterpartyName: string;
+  settlement: SettlementCopy | null;
 };
 
-type StatProps = {
-  label: string;
-  value: string;
-  tone?: string;
-  showDot?: boolean;
-  dotClassName?: string;
-  className?: string;
+type SummaryTableProps = {
+  title: string;
+  action?: React.ReactNode;
+  rows: Array<{
+    label: string;
+    value: string;
+    tone?: 'default' | 'muted' | 'accent';
+  }>;
 };
 
-function Stat({
-  label,
-  value,
-  tone,
-  showDot,
-  dotClassName,
-  className,
-}: StatProps) {
+function SummaryTable({ title, action, rows }: SummaryTableProps) {
   return (
-    <div className={cn('min-w-0 flex-1 space-y-0.5 text-left', className)}>
-      <div className="flex items-center gap-1.5">
-        {showDot ? (
-          <span
-            aria-hidden="true"
-            className={cn('h-2 w-2 shrink-0 rounded-full', dotClassName)}
-          />
-        ) : null}
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+    <section className="w-full rounded-3xl border border-border/40 bg-muted/30 p-4">
+      <div className="mb-2.5 flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold tracking-tight">{title}</p>
+        {action}
       </div>
-      <p
-        className={cn(
-          'text-sm font-semibold tracking-tight sm:text-base',
-          tone
-        )}
-      >
-        {value}
-      </p>
-    </div>
+
+      <div>
+        <Table>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.label} className="border-0">
+                <TableCell
+                  className={cn(
+                    'px-2.5 py-1.5 text-sm',
+                    row.tone === 'muted' && 'text-muted-foreground',
+                    row.tone === 'accent' && 'font-medium text-foreground'
+                  )}
+                >
+                  {row.label}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    'px-2.5 py-1.5 text-right font-medium',
+                    row.tone === 'accent' && 'text-primary'
+                  )}
+                >
+                  {row.value}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </section>
   );
 }
 
-function getBalanceState(summary: ExpenseSummary) {
-  const otherPersonLabel =
-    summary.sharedExpenses.counterparty.name ?? 'Other person';
-  const amount = formatCurrency(Math.abs(summary.sharedExpenses.balance));
-
-  if (summary.sharedExpenses.balance > 0) {
-    return {
-      eyebrow: 'They owe',
-      amount,
-      name: otherPersonLabel,
-      tone: 'text-emerald-700 dark:text-emerald-400',
-      accent: 'bg-emerald-500',
-    };
-  }
-
-  if (summary.sharedExpenses.balance < 0) {
-    return {
-      eyebrow: 'You owe',
-      amount,
-      name: otherPersonLabel,
-      tone: 'text-rose-700 dark:text-rose-400',
-      accent: 'bg-rose-500',
-    };
-  }
-
-  return {
-    eyebrow: 'Settled',
-    amount: formatCurrency(0),
-    name: otherPersonLabel,
-    tone: 'text-foreground',
-    accent: 'bg-foreground/40',
-  };
-}
-
-export function DashboardView({ month, year, summary }: DashboardViewProps) {
+export function DashboardView({
+  month,
+  year,
+  summary,
+  currentUserName,
+  counterpartyName,
+  settlement,
+}: DashboardViewProps) {
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const balanceState = getBalanceState(summary);
-  const amountYouOwe =
-    summary.sharedExpenses.balance < 0
-      ? Math.abs(summary.sharedExpenses.balance)
-      : 0;
-  const youOweLabel =
-    summary.sharedExpenses.balance < 0 && balanceState.name
-      ? `You owe ${balanceState.name}`
-      : 'You owe';
-  const youPaidLabel = summary.sharedExpenses.counterparty.name
-    ? `You paid for ${summary.sharedExpenses.counterparty.name}`
-    : 'You paid';
-  const otherPaidLabel = summary.sharedExpenses.counterparty.name
-    ? `${summary.sharedExpenses.counterparty.name} paid`
-    : 'Other person paid';
-
+  const totalExpenseRows = [
+    {
+      label: 'Total expense',
+      value: formatCurrency(summary.totalExpenses.total),
+      tone: 'accent' as const,
+    },
+    {
+      label: currentUserName,
+      value: formatCurrency(summary.participantExpenses.currentUserTotal),
+    },
+    {
+      label: counterpartyName,
+      value: formatCurrency(summary.participantExpenses.counterpartyTotal),
+    },
+  ];
+  const sharedExpenseRows = [
+    {
+      label: 'Total shared expense',
+      value: formatCurrency(summary.sharedExpenses.total),
+      tone: 'accent' as const,
+    },
+    {
+      label: `${currentUserName} paid`,
+      value: formatCurrency(summary.sharedExpenses.totalPaidByCurrentUser),
+    },
+    {
+      label: `${counterpartyName} paid`,
+      value: formatCurrency(summary.sharedExpenses.totalPaidByOtherUser),
+    },
+  ];
+  const topCategoryRows =
+    summary.totalExpenses.topCategories.length > 0
+      ? summary.totalExpenses.topCategories.map((category) => ({
+          label: category.name,
+          value: formatCurrency(category.total),
+        }))
+      : [
+          {
+            label: 'No categories yet',
+            value: formatCurrency(0),
+            tone: 'muted' as const,
+          },
+        ];
   function updateRoute(nextMonth: Month, nextYear: number) {
     const nextParams = new URLSearchParams(searchParams.toString());
 
@@ -137,13 +153,13 @@ export function DashboardView({ month, year, summary }: DashboardViewProps) {
     startTransition(() => {
       router.replace(
         nextParams.size > 0 ? `${pathname}?${nextParams.toString()}` : pathname,
-        { scroll: false }
+        { scroll: true }
       );
     });
   }
 
   return (
-    <Card className="w-full rounded-[32px] bg-card shadow-sm">
+    <Card size="sm" className="flex h-full min-h-0 w-full flex-1 flex-col shadow-sm">
       <CardHeader>
         <CardTitle>{`${formatMonth(month)} ${year} - Expenses`}</CardTitle>
 
@@ -181,126 +197,60 @@ export function DashboardView({ month, year, summary }: DashboardViewProps) {
         </CardAction>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex min-h-0 flex-1 overflow-y-auto pt-0 pb-4">
         {isPending ? (
           <DashboardMetricsSkeleton />
         ) : (
-          <section aria-label="Expense summary">
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-semibold">Total expenses</p>
-                  <p className="text-xs text-muted-foreground">
-                    Includes individual and shared expenses for this month.
-                  </p>
-                </div>
+          <section
+            aria-label="Expense summary"
+            className="w-full space-y-3 pb-1"
+          >
+            <div className="grid gap-3 md:grid-cols-2">
+              <SummaryTable
+                title="Expense overview"
+                action={
+                  <Button asChild size="xs" className="h-7 px-2.5 text-xs">
+                    <Link href="/add-expense">
+                      <Plus className="size-3.5" />
+                      Add expense
+                    </Link>
+                  </Button>
+                }
+                rows={totalExpenseRows}
+              />
 
-                <div className="flex items-center justify-between gap-2">
-                  <Stat
-                    label="Total"
-                    value={formatCurrency(summary.totalExpenses.total)}
-                  />
-                  <Stat
-                    label="Individual total"
-                    value={formatCurrency(summary.totalExpenses.individualTotal)}
-                  />
-                  <Stat
-                    label="Shared total"
-                    value={formatCurrency(summary.sharedExpenses.total)}
-                  />
-                </div>
-
-                {summary.totalExpenses.topCategories.length > 0 ? (
-                  <div className="flex justify-between gap-2">
-                    {summary.totalExpenses.topCategories.map((category) => (
-                      <Stat
-                        key={category.name}
-                        label={category.name}
-                        value={formatCurrency(category.total)}
-                        className="border-l-2 border-teal-600 p-2"
-                      />
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="space-y-3 border-t pt-4">
-                <div>
-                  <p className="text-sm font-semibold">Shared expenses</p>
-                  <p className="text-xs text-muted-foreground">
-                    Split expenses and expense settlements only.
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between gap-2">
-                  <Stat
-                    label="Shared total"
-                    value={formatCurrency(summary.sharedExpenses.total)}
-                  />
-                  <Stat
-                    label="Per person"
-                    value={formatCurrency(summary.sharedExpenses.expensePerPerson)}
-                  />
-                  <Stat
-                    label={youPaidLabel}
-                    value={formatCurrency(
-                      summary.sharedExpenses.totalPaidByCurrentUser
-                    )}
-                  />
-                  <Stat
-                    label={otherPaidLabel}
-                    value={formatCurrency(
-                      summary.sharedExpenses.totalPaidByOtherUser
-                    )}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-muted/40 px-4 py-3">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      {balanceState.eyebrow}
-                    </p>
-                    <p className={cn('text-lg font-semibold', balanceState.tone)}>
-                      {balanceState.amount}
-                    </p>
-                  </div>
-
-                  <Stat
-                    label={youOweLabel}
-                    value={formatCurrency(amountYouOwe)}
-                    tone={
-                      summary.sharedExpenses.balance < 0
-                        ? 'text-rose-600 dark:text-rose-400'
-                        : 'text-foreground'
-                    }
-                    showDot={summary.sharedExpenses.balance < 0}
-                    dotClassName="bg-rose-500 dark:bg-rose-400"
-                    className="max-w-[160px] flex-none"
-                  />
-                </div>
-              </div>
+              <SummaryTable title="Shared expense" rows={sharedExpenseRows} />
             </div>
 
-            <div className="mt-5 flex items-center justify-end gap-2">
-              <Button asChild size="xs" className="h-8 px-3 text-sm">
-                <Link href="/add-expense">
-                  <Plus className="size-4" />
-                  Expense
-                </Link>
-              </Button>
+            <SummaryTable title="Top 3 categories" rows={topCategoryRows} />
 
-              <Button
-                asChild
-                variant="secondary"
-                size="xs"
-                className="h-8 px-3 text-sm"
-              >
-                <Link href="/add-expense?type=settlement">
-                  <User className="size-4" />
-                  Settle
-                </Link>
-              </Button>
-            </div>
+            {settlement ? (
+              <section className="w-full rounded-3xl border border-border/60 bg-muted/30 px-4 py-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                      Settlement
+                    </p>
+                    <p className="text-sm font-medium">{settlement.text}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 sm:justify-end">
+                    <p className="text-sm font-semibold">
+                      {formatCurrency(settlement.amount)}
+                    </p>
+
+                    <Button
+                      asChild
+                      variant="secondary"
+                      size="xs"
+                      className="h-8 px-3 text-sm"
+                    >
+                      <Link href="/add-expense?type=settlement">Settle</Link>
+                    </Button>
+                  </div>
+                </div>
+              </section>
+            ) : null}
           </section>
         )}
       </CardContent>

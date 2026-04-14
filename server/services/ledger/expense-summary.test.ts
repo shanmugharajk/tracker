@@ -93,6 +93,8 @@ describe('summarizeExpenses', () => {
     expect(summary.sharedExpenses.balance).toBe(30);
     expect(summary.sharedExpenses.counterparty.id).toBe(OTHER_USER_ID);
     expect(summary.sharedExpenses.counterparty.name).toBe('Alex');
+    expect(summary.participantExpenses.currentUserTotal).toBe(90);
+    expect(summary.participantExpenses.counterpartyTotal).toBe(80);
   });
 
   test('picks a deterministic counterparty from the returned expense rows', () => {
@@ -143,5 +145,7 @@ describe('summarizeExpenses', () => {
     expect(summary.sharedExpenses.balance).toBe(125);
     expect(summary.sharedExpenses.counterparty.id).toBe(OTHER_USER_ID);
     expect(summary.sharedExpenses.counterparty.name).toBe('Bob');
+    expect(summary.participantExpenses.currentUserTotal).toBe(125);
+    expect(summary.participantExpenses.counterpartyTotal).toBe(135);
   });
 });

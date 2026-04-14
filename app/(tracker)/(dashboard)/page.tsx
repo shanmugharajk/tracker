@@ -1,6 +1,7 @@
 import { requireSession, resolveDateFilters } from '~/server/lib/request';
 import {
   fetchExpensesByMonth,
+  getSettlementCopy,
   summarizeExpenses,
 } from '~/server/services/ledger';
 
@@ -18,6 +19,23 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
   });
 
   const summary = summarizeExpenses(expenses, session.user.id);
+  const currentUserName = session.user.name.trim();
+  const counterpartyName =
+    summary.sharedExpenses.counterparty.name?.trim() || 'Other person';
+  const settlement = getSettlementCopy(
+    summary.sharedExpenses.balance,
+    currentUserName,
+    counterpartyName
+  );
 
-  return <DashboardView month={month} year={year} summary={summary} />;
+  return (
+    <DashboardView
+      month={month}
+      year={year}
+      summary={summary}
+      currentUserName={currentUserName}
+      counterpartyName={counterpartyName}
+      settlement={settlement}
+    />
+  );
 }

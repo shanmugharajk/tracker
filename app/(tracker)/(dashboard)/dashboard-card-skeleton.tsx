@@ -4,40 +4,61 @@ import { Skeleton } from '~/components/ui/skeleton';
 export function DashboardMetricsSkeleton() {
   return (
     <div className="space-y-3">
-      <div className="mb-6 flex gap-2 justify-between">
-        <div className="min-w-0 flex-1 space-y-0.5 border-l-2 border-transparent p-2 text-left">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-5 w-20" />
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="w-full rounded-3xl border border-border/60 bg-background/70 p-4">
+          <div className="mb-2.5 flex items-center justify-between gap-3">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-7 w-24 rounded-full" />
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-border/60">
+            <div className="space-y-0">
+              <Skeleton className="h-10 w-full rounded-none" />
+              <Skeleton className="h-10 w-full rounded-none" />
+              <Skeleton className="h-10 w-full rounded-none" />
+            </div>
+          </div>
         </div>
-        <div className="min-w-0 flex-1 space-y-0.5 border-l-2 border-transparent p-2 text-left">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-5 w-20" />
-        </div>
-        <div className="min-w-0 flex-1 space-y-0.5 border-l-2 border-transparent p-2 text-left">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-5 w-20" />
+
+        <div className="w-full rounded-3xl border border-border/60 bg-background/70 p-4">
+          <div className="mb-2.5 flex items-center justify-between gap-3">
+            <Skeleton className="h-4 w-28" />
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-border/60">
+            <div className="space-y-0">
+              <Skeleton className="h-10 w-full rounded-none" />
+              <Skeleton className="h-10 w-full rounded-none" />
+              <Skeleton className="h-10 w-full rounded-none" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="rounded-[22px] bg-muted/20 px-4 py-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="space-y-1">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-5 w-20" />
-          </div>
-          <div className="space-y-1">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-5 w-20" />
-          </div>
-          <div className="space-y-1">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-5 w-20" />
-          </div>
+      <div className="w-full rounded-3xl border border-border/60 bg-background/70 p-4">
+        <div className="mb-2.5">
+          <Skeleton className="h-4 w-32" />
         </div>
 
-        <div className="mt-3 flex items-center justify-end gap-2">
-          <Skeleton className="h-8 w-28 rounded-full" />
-          <Skeleton className="h-8 w-20 rounded-full" />
+        <div className="overflow-hidden rounded-2xl border border-border/60">
+          <div className="space-y-0">
+            <Skeleton className="h-10 w-full rounded-none" />
+            <Skeleton className="h-10 w-full rounded-none" />
+            <Skeleton className="h-10 w-full rounded-none" />
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full rounded-3xl border border-border/60 bg-muted/30 px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-8 w-20 rounded-full" />
+          </div>
         </div>
       </div>
     </div>
@@ -46,8 +67,8 @@ export function DashboardMetricsSkeleton() {
 
 export function DashboardCardSkeleton() {
   return (
-    <Card className="w-full rounded-[32px] shadow-sm">
-      <CardHeader className="px-4 pb-1 pt-4 sm:px-5 sm:pt-5">
+    <Card size="sm" className="w-full shadow-sm">
+      <CardHeader className="px-4 pb-2 pt-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <Skeleton className="h-3 w-20" />
@@ -57,7 +78,7 @@ export function DashboardCardSkeleton() {
         </div>
       </CardHeader>
 
-      <CardContent className="px-4 pb-4 pt-2 sm:px-5 sm:pb-5">
+      <CardContent className="px-4 pb-4 pt-0">
         <DashboardMetricsSkeleton />
       </CardContent>
     </Card>
