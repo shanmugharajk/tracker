@@ -1,5 +1,8 @@
 import { env } from '~/config/env';
 import { auth } from '~/server/lib/auth';
+import { db, user } from '~/server/db';
+import { eq } from 'drizzle-orm';
+import type { UserType } from '~/server/db/schema';
 
 import { SEED_USER_ROLES, type SeedUserIds } from './shared';
 
@@ -12,6 +15,11 @@ export async function seedUser(
   userNames: SeedUserNames = env.SEED_USER_NAMES
 ): Promise<SeedUserIds> {
   const seededUsers = {} as SeedUserIds;
+  const userTypes: [UserType, UserType, UserType] = [
+    'expense',
+    'expense',
+    'loan',
+  ];
 
   for (const [index, name] of userNames.entries()) {
     const email = createSeedEmail(name);
@@ -26,6 +34,13 @@ export async function seedUser(
     if (!result?.user?.id) {
       throw new Error(`Failed to seed user: ${name}.`);
     }
+
+    const userType = userTypes[index];
+
+    await db
+      .update(user)
+      .set({ userType })
+      .where(eq(user.id, result.user.id));
 
     seededUsers[SEED_USER_ROLES[index]] = result.user.id;
   }

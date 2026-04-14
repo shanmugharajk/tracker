@@ -13,7 +13,7 @@ export function AppShell({
       <Sidebar variant="inset" />
       <SidebarInset>
         <Header />
-        <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4">
+        <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto p-4">
           {children}
         </div>
       </SidebarInset>

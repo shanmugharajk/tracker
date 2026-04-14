@@ -8,6 +8,8 @@ import {
   text,
 } from 'drizzle-orm/sqlite-core';
 
+import { expenseCategoryValues } from '~/lib/expense-categories';
+
 // tracker tables
 export const ledgerEntryTypes = [
   'expense',
@@ -16,15 +18,11 @@ export const ledgerEntryTypes = [
   'settlement',
 ] as const;
 
-export const ledgerEntryCategories = [
-  'Groceries',
-  'Restaurants',
-  'Bills',
-  'Home',
-  'Shopping',
-] as const;
+export const ledgerEntryCategories = expenseCategoryValues;
 
 export const ledgerSettlementTargets = ['expense', 'loan'] as const;
+export const userTypes = ['expense', 'loan'] as const;
+export type UserType = (typeof userTypes)[number];
 
 export const ledgerEntry = sqliteTable(
   'ledger_entry',
@@ -96,6 +94,7 @@ export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
+  userType: text('user_type', { enum: userTypes }).notNull().default('expense'),
   emailVerified: integer('email_verified', { mode: 'boolean' })
     .default(false)
     .notNull(),

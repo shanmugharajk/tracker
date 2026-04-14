@@ -90,7 +90,7 @@ describe('summarizeExpenses', () => {
     expect(summary.sharedExpenses.expensePerPerson).toBe(60);
     expect(summary.sharedExpenses.totalPaidByCurrentUser).toBe(80);
     expect(summary.sharedExpenses.totalPaidByOtherUser).toBe(40);
-    expect(summary.sharedExpenses.balance).toBe(30);
+    expect(summary.sharedExpenses.balance).toBe(10);
     expect(summary.sharedExpenses.counterparty.id).toBe(OTHER_USER_ID);
     expect(summary.sharedExpenses.counterparty.name).toBe('Alex');
     expect(summary.participantExpenses.currentUserTotal).toBe(90);
@@ -147,5 +147,46 @@ describe('summarizeExpenses', () => {
     expect(summary.sharedExpenses.counterparty.name).toBe('Bob');
     expect(summary.participantExpenses.currentUserTotal).toBe(125);
     expect(summary.participantExpenses.counterpartyTotal).toBe(135);
+  });
+
+  test('treats expense settlements as balance offsets', () => {
+    const summary = summarizeExpenses(
+      [
+        createExpenseRecord({
+          id: 'shared-current',
+          category: 'Groceries',
+          amount: 80,
+          personId: OTHER_USER_ID,
+          personName: 'Alex',
+          isSplit: true,
+        }),
+        createExpenseRecord({
+          id: 'shared-other',
+          category: 'Bills',
+          amount: 40,
+          personId: OTHER_USER_ID,
+          personName: 'Alex',
+          paidByUserId: OTHER_USER_ID,
+          paidByUserName: 'Alex',
+          isSplit: true,
+        }),
+        createExpenseRecord({
+          id: 'settlement',
+          type: 'settlement',
+          settlementFor: 'expense',
+          category: null,
+          amount: 20,
+          personId: OTHER_USER_ID,
+          personName: 'Alex',
+          paidByUserId: OTHER_USER_ID,
+          paidByUserName: 'Alex',
+        }),
+      ],
+      CURRENT_USER_ID
+    );
+
+    expect(summary.sharedExpenses.balance).toBe(0);
+    expect(summary.sharedExpenses.counterparty.id).toBe(OTHER_USER_ID);
+    expect(summary.sharedExpenses.counterparty.name).toBe('Alex');
   });
 });

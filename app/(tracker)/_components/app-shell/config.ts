@@ -12,7 +12,7 @@ export type NavGroup = {
 
 export const sidebarData: NavGroup[] = [
   {
-    title: 'Expenses',
+    title: 'Home expenses',
     url: '/',
     items: [
       {
@@ -20,8 +20,12 @@ export const sidebarData: NavGroup[] = [
         url: '/',
       },
       {
-        title: 'All expenses',
+        title: 'View all expenses',
         url: '/all-expenses',
+      },
+      {
+        title: 'Add expense',
+        url: '/add-expense',
       },
     ],
   },

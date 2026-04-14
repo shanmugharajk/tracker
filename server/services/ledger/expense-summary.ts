@@ -153,7 +153,7 @@ function summarizeSharedBalance(
 
   for (const entry of settlementEntries) {
     balance +=
-      entry.paidByUserId === currentUserId ? -entry.amount : entry.amount;
+      entry.paidByUserId === currentUserId ? -entry.amount : +entry.amount;
   }
 
   return roundCurrency(balance);

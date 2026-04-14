@@ -29,6 +29,7 @@ import type {
 } from '~/server/services/ledger';
 
 import { DashboardMetricsSkeleton } from './dashboard-card-skeleton';
+import { SettlementForm } from './settlement-form';
 
 type DashboardViewProps = {
   month: Month;
@@ -239,14 +240,10 @@ export function DashboardView({
                       {formatCurrency(settlement.amount)}
                     </p>
 
-                    <Button
-                      asChild
-                      variant="secondary"
-                      size="xs"
-                      className="h-8 px-3 text-sm"
-                    >
-                      <Link href="/add-expense?type=settlement">Settle</Link>
-                    </Button>
+                    <SettlementForm
+                      defaultAmount={settlement.amount}
+                      settlementText={settlement.text}
+                    />
                   </div>
                 </div>
               </section>
