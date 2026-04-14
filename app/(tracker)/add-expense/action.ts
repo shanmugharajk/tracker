@@ -4,8 +4,8 @@ import {
   createServerValidate,
   ServerValidateError,
 } from '@tanstack/react-form-nextjs';
+import type { AnyFormApi } from '@tanstack/react-form';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 import { requireSession } from '~/server/lib/request';
 import { createExpenseEntry } from '~/server/services/expenses';
@@ -18,6 +18,16 @@ const serverValidateAddExpense = createServerValidate({
   onServerValidate: addExpenseSchema as never,
 });
 
+type AddExpenseToast = {
+  id: string;
+  kind: 'success' | 'error';
+  message: string;
+};
+
+export type AddExpenseActionState = Partial<AnyFormApi['state']> & {
+  toast?: AddExpenseToast;
+};
+
 function normalizeText(value: string | undefined) {
   const trimmed = value?.trim();
 
@@ -27,7 +37,7 @@ function normalizeText(value: string | undefined) {
 export const addExpenseAction = async (
   _previous: unknown,
   formData: FormData
-) => {
+): Promise<AddExpenseActionState> => {
   try {
     const session = await requireSession();
     const values = await serverValidateAddExpense(formData);
@@ -59,10 +69,23 @@ export const addExpenseAction = async (
 
     revalidatePath('/');
     revalidatePath('/all-expenses');
+
+    return {
+      toast: {
+        id: String(Date.now()),
+        kind: 'success',
+        message: 'Expense added successfully.',
+      },
+    };
   } catch (error) {
     if (error instanceof ServerValidateError) {
       return {
         ...error.formState,
+        toast: {
+          id: String(Date.now()),
+          kind: 'error',
+          message: 'Please fix the highlighted fields and try again.',
+        },
       };
     }
 
@@ -71,6 +94,11 @@ export const addExpenseAction = async (
         errorMap: {
           onSubmit: { form: error.message },
         },
+        toast: {
+          id: String(Date.now()),
+          kind: 'error',
+          message: error.message,
+        },
       };
     }
 
@@ -78,8 +106,11 @@ export const addExpenseAction = async (
       errorMap: {
         onSubmit: { form: 'Something went wrong, please try again later!' },
       },
+      toast: {
+        id: String(Date.now()),
+        kind: 'error',
+        message: 'Something went wrong, please try again later!',
+      },
     };
   }
-
-  redirect('/');
 };

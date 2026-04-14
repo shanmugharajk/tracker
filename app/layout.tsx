@@ -6,6 +6,7 @@ import { cn } from '~/lib/cn';
 import '~/app/styles/globals.css';
 import { ThemeProvider } from '~/components/theme-provider';
 import { TooltipProvider } from '~/components/ui/tooltip';
+import { Toaster } from '~/components/ui/toaster';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -37,7 +38,10 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

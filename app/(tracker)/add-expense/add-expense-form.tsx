@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 
 import { initialFormState, useForm } from '@tanstack/react-form-nextjs';
 
@@ -24,10 +24,11 @@ import {
 } from '~/components/ui/card';
 import { FormField } from '~/components/form-field';
 import { FormError } from '~/lib/forms/form-error';
+import { useToast } from '~/lib/hooks/use-toast';
 import { SubmitButton } from '~/lib/forms/submit-button';
 import { useServerFormOptions } from '~/lib/forms/server-form';
 
-import { addExpenseAction } from './action';
+import { addExpenseAction, type AddExpenseActionState } from './action';
 import {
   addExpenseDefaultValues,
   addExpenseSchema,
@@ -44,10 +45,13 @@ type AddExpenseFormProps = {
 };
 
 export function AddExpenseForm({ users, currentUserId }: AddExpenseFormProps) {
-  const [state, action, pending] = useActionState(
-    addExpenseAction,
-    initialFormState
-  );
+  const [state, action, pending] = useActionState<
+    AddExpenseActionState,
+    FormData
+  >(addExpenseAction, initialFormState as AddExpenseActionState);
+
+  const { toast } = useToast();
+  const lastToastIdRef = useRef<string | null>(null);
 
   const form = useForm({
     ...formOpts,
@@ -57,6 +61,29 @@ export function AddExpenseForm({ users, currentUserId }: AddExpenseFormProps) {
     },
     ...useServerFormOptions(addExpenseSchema, state),
   });
+
+  useEffect(() => {
+    if (!state.toast || state.toast.id === lastToastIdRef.current) return;
+
+    lastToastIdRef.current = state.toast.id;
+
+    if (state.toast.kind === 'success') {
+      form.reset({
+        ...addExpenseDefaultValues,
+        paidByUserId: currentUserId,
+      });
+    }
+
+    toast({
+      title:
+        state.toast.kind === 'success'
+          ? 'Expense added'
+          : 'Could not save expense',
+      description: state.toast.message,
+      variant: state.toast.kind === 'success' ? 'default' : 'destructive',
+      duration: 4000,
+    });
+  }, [currentUserId, form, state.toast, toast]);
 
   return (
     <Card className="overflow-hidden">
